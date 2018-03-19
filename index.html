@@ -9,7 +9,11 @@
 
     <!-- Add a link to reset file -->
     <link rel="stylesheet" href="assets/css/reset.com">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/flatly/bootstrap.min.css">
 
+    <!-- Font Awesome CSS Icons (For cool glyphicons) -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  
     <!-- Add a link to the Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
@@ -30,6 +34,163 @@
                 <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
             </div>
         </div>
+        <div class="container">
+            <div class="row">
+              <div class="col-sm-12">
+                <br>
+                <!-- First panel is for handling the search parameters -->
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+                    <h3 class="panel-title"><strong><i class="fa  fa-list-alt"></i>   Food Recipe</strong></h3>
+                  </div>
+                  <div class="panel-body">
+        
+                    <!-- Here we create an HTML Form for handling the inputs-->
+                    <form role="form">
+        
+                      <!-- Here we create the text box for capturing the search term-->
+                      <div class="form-group">
+                        <label for="search">Recipe Name</label>
+                        <input type="text" class="form-control" id="name">
+                      </div>
+
+                      <form role="form">
+        
+                        <!-- Here we create the text box for capturing the search term-->
+                        <div class="form-group">
+                          <label for="search">Ingredient</label>
+                          <input type="text" class="form-control" id="name">
+                        </div>
+                      
+                      <!-- Here we capture the number of records that the user wants to retrieve  -->
+                      <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Choice of Meat
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          <a class="dropdown-item" href="#">Chicken</a>
+                          <a class="dropdown-item" href="#">Fish</a>
+                          <a class="dropdown-item" href="#">Beef</a>
+                          <a class="dropdown-item" href="#">Pork</a>
+                          <a class="dropdown-item" href="#">Vegetarian</a>
+                        </div>
+                      </div>
+                  
+        
+                      <!-- Here we capture the Start Year Parameter-->
+                     <br>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                             Cook Time
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                              <a class="dropdown-item" href="#">>30</a>
+                              <a class="dropdown-item" href="#">>60</a>
+                              <a class="dropdown-item" href="#">>90</a>
+                              <a class="dropdown-item" href="#">>120</a>
+                              <a class="dropdown-item" href="#"><120</a>
+                            </div>
+                          </div>
+                      
+                          <br>
+                      <!-- Here we capture the End Year Parameter -->
+                      <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Serving Size
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          <a class="dropdown-item" href="#"> 2 </a>
+                          <a class="dropdown-item" href="#">4</a>
+                          <a class="dropdown-item" href="#">6</a>
+                          <a class="dropdown-item" href="#">8</a>
+                          <a class="dropdown-item" href="#"><8</a>
+                        </div>
+                      </div>
+                      <br>
+                      <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Calorie Count
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          <a class="dropdown-item" href="#">300-600</a>
+                          <a class="dropdown-item" href="#">601-900</a>
+                          <a class="dropdown-item" href="#">901-1200</a>
+                          <a class="dropdown-item" href="#">1201-1500</a>
+                          <a class="dropdown-item" href="#"><1500</a>
+                        </div>
+                      </div>
+                  <br>
+                      <!-- Here we have our final submit button -->
+                      <button type="submit" class="btn btn-default" id="run-search"><i class="fa fa-search"></i> Submit</button>
+                      
+        
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-12">
+                <br>
+                <!-- First panel is for handling the search parameters -->
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+                    <h3 class="panel-title"><strong><i class="fa  fa-list-alt"></i>  Drink Recipe</strong></h3>
+                  </div>
+                  <div class="panel-body">
+        
+                    <!-- Here we create an HTML Form for handling the inputs-->
+                    <form role="form">
+        
+                      <!-- Here we create the text box for capturing the search term-->
+                      <div class="form-group">
+                        <label for="search">Drink Name</label>
+                        <input type="text" class="form-control" id="name">
+                      </div>
+        
+                      <!-- Here we capture the number of records that the user wants to retrieve  -->
+                     
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              Liquor
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                              <a class="dropdown-item" href="#">Vodka</a>
+                              <a class="dropdown-item" href="#">Gin</a>
+                              <a class="dropdown-item" href="#">Rum</a>
+                              <a class="dropdown-item" href="#">Tequila</a>
+                              <a class="dropdown-item" href="#">Whiskey</a>
+                            </div>
+                          </div>
+                      
+                        <br>
+                      <!-- Here we capture the Start Year Parameter-->
+                      <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Calorie Count
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          <a class="dropdown-item" href="#">300-600</a>
+                          <a class="dropdown-item" href="#">601-900</a>
+                          <a class="dropdown-item" href="#">901-1200</a>
+                          <a class="dropdown-item" href="#">1201-1500</a>
+                          <a class="dropdown-item" href="#"><1500</a>
+                        </div>
+                      </div>
+                  <br>
+        
+                      <!-- Here we have our final submit button -->
+                      <button type="submit" class="btn btn-default" id="run-search"><i class="fa fa-search"></i> Submit</button>
+                      
+        
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         <!-- End Of Jumbotron-->
 
 
