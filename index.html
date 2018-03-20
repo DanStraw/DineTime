@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="assets/css/reset.css">
 
     <!-- Add a link to the Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
 
     <!-- Add a link to css file -->
@@ -23,6 +23,8 @@
 
 <body>
     <div class="container">
+
+
         <!-- Jumbotron -->
         <div class="jumbotron jumbotron-fluid">
             <div class="container">
@@ -31,6 +33,58 @@
             </div>
         </div>
         <!-- End Of Jumbotron-->
+
+        <div class="row">
+            <!-- Action Submission Form  -->
+            <div class="col-12 col-sm-12 col-md-6 col-lg-4">
+                <form id="food-drink">
+                    <h2>
+                        <legend>Food Submission</legend>
+                    </h2>
+                    <!-- <div class="form-group"> -->
+                    <label for="food-input">Search your Food</label>
+                    <input type="text" id="food-input">
+                    <!-- </div> -->
+                    <input id="search-food" type="submit" value="Add" class="btn btn-warning">
+                </form>
+            </div>
+
+
+            <!-- Action Submission Form  -->
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                <form id="food-drink">
+                    <h2>
+                        <legend>Drink Submission</legend>
+                    </h2>
+                    <!-- <div class="form-group"> -->
+                    <label for="drink-input">Search your Drink</label>
+                    <input type="text" id="drink-input">
+                    <!-- </div> -->
+                    <input id="search-drink" type="submit" value="Add" class="btn btn-warning">
+
+                </form>
+            </div>
+        </div>
+
+<hr>
+
+<div class="row" id="food-drink-view">
+
+</div>
+
+
+<hr>
+
+
+
+
+
+
+
+
+
+
+
 
 
     </div>
