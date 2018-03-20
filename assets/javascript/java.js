@@ -75,16 +75,16 @@ function drinkSearch(drink) {
         url: queryURL,
         method: 'GET',
     }).then(function (response) {
-        $("#food-drink-view").empty();
+        // $("#food-drink-view").empty();
         console.log(response)
 
         for (var i = 0; i < response.drinks.length; i++) {
-            var imageDiv = $('<div>');
-            imageDiv.addClass('imgClass');
+            // var imageDiv = $('<div>');
+            // imageDiv.addClass('imgClass');
 
             // Make an image div
-            var image = $("<img>");
-            image.attr("src", response.drinks[i].strDrinkThumb);
+            var image = $(".img");
+            $(".img").attr("src", response.drinks[i].strDrinkThumb);
             imageDiv.append(image);
 
             var pOne = $("<p>").text("Drink-ID: " + response.drinks[i].idDrink);
