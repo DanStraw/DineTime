@@ -8,7 +8,7 @@ $("#search-food").on("click", function (event) {
         foodSearch(food);
     }
 
-})  // End of $("#search-food").on("click", function (event) {}
+}) // End of $("#search-food").on("click", function (event) {}
 
 
 // Drink Search
@@ -21,7 +21,7 @@ $("#search-drink").on("click", function (event) {
         drinkSearch(drink);
     }
 
-})  // End of $("#search-food").on("click", function (event) {}
+}) // End of $("#search-food").on("click", function (event) {}
 
 
 // Food search function
@@ -62,7 +62,7 @@ function foodSearch(food) {
 
     })
 
-}   //  End of function foodSearch(food){}
+} //  End of function foodSearch(food){}
 
 
 
@@ -77,43 +77,51 @@ function drinkSearch(drink) {
     }).then(function (response) {
         // $("#food-drink-view").empty();
         console.log(response)
+        var API_KEY = "fb001d1c57dffa88545ebe6f986046e9	";
+        var APP_ID = "5f782d14";
+        var queryURL = "https://api.edamam.com/search?app_id=" + APP_ID + "&app_key=" + API_KEY + "&q=" + drink;
 
-        for (var i = 0; i < response.drinks.length; i++) {
-            // var imageDiv = $('<div>');
-            // imageDiv.addClass('imgClass');
+        $.ajax({
+            url: queryURL,
+            method: 'GET',
+        }).then(function (call) {
 
-            // Make an image div
-            var image = $(".img");
-            $(".img").attr("src", response.drinks[i].strDrinkThumb);
-            imageDiv.append(image);
+            for (var i = 0; i < response.drinks.length; i++) {
+                var imageDiv = $('<div>');
+                imageDiv.addClass('imgClass');
 
-            var pOne = $("<p>").text("Drink-ID: " + response.drinks[i].idDrink);
-            imageDiv.append(pOne);
+                // Make an image div
+                var image = $(".img");
+                $(".img").attr("src", response.drinks[i].strDrinkThumb);
+                imageDiv.append(image);
+               
+                var pOne = $("<p>").text("Drink-ID: " + response.drinks[i].idDrink);
+                imageDiv.append(pOne);
 
-            var pTwo = $("<p>").text("Drink Label: " + response.drinks[i].strDrink);
-            imageDiv.append(pTwo);
+                var pTwo = $("<p>").text("Drink Label: " + response.drinks[i].strDrink);
+                imageDiv.append(pTwo);
 
-            var pThree = $("<p>").text("Alcohol: " + response.drinks[i].strAlcoholic);
-            imageDiv.append(pThree);
-            var drinkObj = response.drinks[i]
-            for (var j = 9; j < 23; j++) {
-                var ingredient = drinkObj[Object.keys(drinkObj)[j]];
-                if (ingredient !== "") {
-                    var pFour = $("<p>").text("Ingredient: " + drinkObj[Object.keys(drinkObj)[j]]);
-                    imageDiv.append(pFour);
+                var pFour = $("<p>").text("Calories: " + call.hits[0].recipe.calories);
+                imageDiv.append(pFour)
+
+                var pThree = $("<p>").text("Alcohol: " + response.drinks[i].strAlcoholic);
+                imageDiv.append(pThree);
+                var drinkObj = response.drinks[i]
+                for (var j = 9; j < 23; j++) {
+                    var ingredient = drinkObj[Object.keys(drinkObj)[j]];
+                    if (ingredient !== "") {
+                        var pFour = $("<p>").text("Ingredient: " + drinkObj[Object.keys(drinkObj)[j]]);
+                        imageDiv.append(pFour);
+                    }
                 }
+              
+
+                var pFive = $("<p>").text("Instruction: " + response.drinks[i].strInstructions);
+                imageDiv.append(pFive);
+                $("#food-drink-view").prepend(imageDiv);
+
             }
-            var pFive = $("<p>").text("Instruction: " + response.drinks[i].strInstructions);
-            imageDiv.append(pFive);
-            $("#food-drink-view").prepend(imageDiv);
+        })
+    }) // End of the response function
 
-        }
-
-    })  // End of the response function
-
-}   //  End of function foodSearch(food){}
-
-
-
-
-
+} //  End of function foodSearch(food){}
