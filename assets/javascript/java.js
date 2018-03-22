@@ -23,6 +23,14 @@ $("#search-food").on("click", function (event) {
         $("#food-input").val("")
         foodSearch(food);
     }
+
+    
+    // alert window that shows nothing enter in the search box
+    else{
+        swal("You didn't enter anythink on the search box!");
+    }
+
+
 })  // End of $("#search-food").on("click", function (event) {}
 
 // Drink Search
@@ -33,6 +41,11 @@ $("#search-drink").on("click", function (event) {
     if (drink !== "") {
         $("#drink-input").val("")
         drinkSearch(drink);
+    }
+
+    // alert window that shows nothing enter in the search box
+    else{
+        swal("You didn't enter anythink on the search box!");
     }
     
 
