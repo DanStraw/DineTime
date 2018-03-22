@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -51,6 +52,7 @@
                   <i class="fa  fa-list-alt"></i> Food Recipe</strong>
               </h3>
             </div>
+
             <div class="panel-body">
 
               <!-- Here we create an HTML Form for handling the inputs-->
@@ -68,6 +70,21 @@
                   <div class="form-group">
                     <label for="search">Ingredient</label>
                     <input type="text" class="form-control" id="ingredient">
+
+        </div>
+        <aside><h3>Search History</h3>
+          <div><h5 id="dish-div">Dishes</h5><ul id="dish-history"></ul></div>
+          <div><h5 id="drink-div">Drinks</h5><ul id="drink-history"></ul></div>
+        </aside>
+        <div class="container">
+            <div class="row">
+              <div class="col-sm-12">
+                <br>
+                <!-- First panel is for handling the search parameters -->
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+                    <h3 class="panel-title"><strong><i class="fa  fa-list-alt"></i>   Food Recipe</strong></h3>
+
                   </div>
 
 
@@ -122,10 +139,67 @@
                   <option value="Gin">Non-Alcoholic</option>
                 </select>
                 <br>
+
                 <br>
                 <div class="form-group">
                   <label for="search">Drink Name</label>
                   <input type="text" class="form-control" id="drink-input">
+                <!-- First panel is for handling the search parameters -->
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+                    <h3 class="panel-title"><strong><i class="fa  fa-list-alt"></i>  Drink Recipe</strong></h3>
+                  </div>
+                  <div class="panel-body">
+        
+                    <!-- Here we create an HTML Form for handling the inputs-->
+                    <form role="form">
+        
+                      <!-- Here we create the text box for capturing the search term-->
+                     
+                      <h6><b>Alcoholic/Non-Alcoholic</b></h6>
+                      <select>
+                        <option value="Select">Select</option>
+                        <option value="Alcoholic">Alcoholic</option>
+                        <option value="Gin">Non-Alcoholic</option>
+                      </select>
+                      <br>
+                      <br>
+                      <div class="form-group">
+                        <label for="search">Drink Name</label>
+                        <input type="text" class="form-control" id="drink-input">
+                      </div>
+        
+                      <!-- Here we capture the number of records that the user wants to retrieve  -->
+                     <h6><b>Liquor</b></h6>
+                      <select id="liqour-type">
+                        <option value="Select">Select</option>
+                        <option value="Vodka">Vodka</option>
+                        <option value="Gin">Gin</option>
+                        <option value="Rum">Rum</option>
+                        <option value="Tequil">Tequila</option>
+                        <option value="Whiskey">Whiskey</option>
+                      </select>
+                      <br>
+                        <br>
+                      <!-- Here we capture the Start Year Parameter-->
+                      <h6><b>Calorie Count</b></h6>
+                      <select>
+                        <option value="select">Select</option>
+                        <option value="calorie1">&lt;300</option>
+                        <option value="calorie2">301-600</option>
+                        <option value="calorie3">601-900</option>
+                        <option value="calorie4">901-1200</option>
+                        <option value="calorie5">&lt;1200&gt;</option>
+                        
+                      </select>
+                  <br>
+                      <br>
+                      <!-- Here we have our final submit button -->
+                      <button type="submit" class="btn btn-default" id="search-drink"><i class="fa fa-search"></i> Submit</button>
+                      
+        
+                    </form>
+                  </div>
                 </div>
 
                 <!-- Here we capture the number of records that the user wants to retrieve  -->

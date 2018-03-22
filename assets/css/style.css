@@ -26,3 +26,17 @@ img{
     height:200px;
     border-radius: 5px;
 }
+
+#item-name {
+    font-weight: bold;
+}
+
+aside {
+    position: absolute;
+    right: 40px;
+    top: 40px;
+}
+
+h5 {
+    text-decoration: underline;
+}

@@ -7,31 +7,36 @@ var config = {
     storageBucket: "",
     messagingSenderId: "647476940046"
     };
-    firebase.initializeApp(config);
-    var database = firebase.database();
+firebase.initializeApp(config);
+var database = firebase.database();
+
+$("#drink-history").hide();
+$("#dish-history").hide();
+var drinkHist = false;
+var dishHist = false;
     
 // Food Search
 $("#search-food").on("click", function (event) {
     event.preventDefault();
     var food = $("#food-input").val().trim();
-    console.log(food);
     if (food !== "") {
         $("#food-input").val("")
         foodSearch(food);
     }
+
     
     // alert window that shows nothing enter in the search box
     else{
         swal("You didn't enter anythink on the search box!");
     }
 
-})  // End of $("#search-food").on("click", function (event) {}
 
+})  // End of $("#search-food").on("click", function (event) {}
 
 // Drink Search
 $("#search-drink").on("click", function (event) {
     event.preventDefault();
-
+    console.log($("#liquor-type").value);
     var drink = $("#drink-input").val().trim();
     if (drink !== "") {
         $("#drink-input").val("")
@@ -60,136 +65,147 @@ function foodSearch(food) {
         method: 'GET',
     }).then(function (data) {
         $("#food-drink-view").empty();
-        console.log(data);
+        var results = [];
         for (var i = 0; i < data.hits.length; i++) {
-            var image = data.hits[i].recipe.image;
-            var dishName = data.hits[i].recipe.label;
-            var ingredients = data.hits[i].recipe.ingredientLines;
-            var calories = data.hits[i].recipe.calories;
-            var weight = data.hits[i].recipe.totalWeight;
-
-            database.ref().push( {
-                dishName: dishName,
-                ingredients: ingredients,
-                calories: calories,
-                image: image,
-                weight: weight,
-            });
-
-            // var imageDiv = $('<div>');
-            // imageDiv.addClass('imgClass');
-
-            // var image = $("<img>");
-            // image.attr("src", response.hits[i].recipe.image);
-            // imageDiv.append(image);
-
-            // var pOne = $("<p>").text("Label: " + response.hits[i].recipe.label);
-            // imageDiv.append(pOne);
-
-            // var pTwo = $("<p>").text("Ingredient: " + response.hits[i].recipe.ingredientLines);
-            // imageDiv.append(pTwo);
-
-            // var pThree = $("<p>").text("Calories: " + response.hits[i].recipe.calories);
-            // imageDiv.append(pThree);
-
-            // var pFour = $("<p>").text("Total Weight: " + response.hits[i].recipe.totalWeight);
-            // imageDiv.append(pFour);
-
-            // $("#food-drink-view").prepend(imageDiv);
+            var resultItem = {
+                image: data.hits[i].recipe.image,
+                dishName: data.hits[i].recipe.label,
+                ingredients: data.hits[i].recipe.ingredientLines,
+                calories: data.hits[i].recipe.calories,
+                weight: data.hits[i].recipe.totalWeight,
+            }
+            results.push(resultItem);
         }
-
-
+        database.ref().push( {
+            SearchTerm: food,
+            results: results,
+        });
     })
-
 }   //  End of function foodSearch(food){}
 
 
 
 // Drink search function
 function drinkSearch(drink) {
-    $("#food-drink-view").empty();
     var queryURL = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + drink;
-
     // API response function
     $.ajax({
         url: queryURL,
         method: 'GET',
     }).then(function (response) {
         $("#food-drink-view").empty();
-
+        var results = [];  
         for (var i = 0; i < response.drinks.length; i++) {
-            
-            var drinkObj = response.drinks[i]
-            var drinkName = drinkObj.strDrink
+            var drinkObj = response.drinks[i];
             var ingredients = [];
             var measurements = [];
-
-
             for (var j = 9; j < 23; j++) {
                 var ingredient = drinkObj[Object.keys(drinkObj)[j]];
-                var measurement = drinkObj[Object.keys(drinkObj)[j + 16]];
+                var measurement = drinkObj[Object.keys(drinkObj)[j + 15]];
                 if (ingredient !== "") {
-                    ingredients.push(ingredient)
+                    ingredients.push(ingredient);
                     measurements.push(measurement);
                 }    
-
             }
-            database.ref().push( {
-                drink: drinkName,
+            var resultItem = {
+                drinkName: drinkObj.strDrink,
                 ID: drinkObj.idDrink,
-                type: drinkObj.strAlcoholic,
                 ingredients: ingredients,
                 measurements: measurements,
+                type: drinkObj.strAlcoholic,
                 picture: drinkObj.strDrinkThumb,
                 instructions: drinkObj.strInstructions,
-            });
+            }
+            results.push(resultItem);     
         }
+        database.ref().push( {
+            SearchTerm: drink,
+            results: results,    
+        });
 
     })  // End of the response function
 
 }   //  End of function foodSearch(food){}
 
 database.ref().on("child_added", function(snapshot) {
-    if ([Object.keys(snapshot.val())[1]] == "drink") {
-        var imageDiv = $('<div>');
-        imageDiv.addClass('imgClass');
-        // Make an image div
-        var image = $("<img>");
-        image.attr("src", snapshot.val().picture);
-        imageDiv.append(image);
-        var pOne = $("<p>").text("Drink-ID: " + snapshot.val().ID);
-        imageDiv.append(pOne);
-        var pTwo = $("<p>").text("Drink Label: " + snapshot.val().drink);
-        imageDiv.append(pTwo);
-        var pThree = $("<p>").text("Alcohol: " + snapshot.val().type);
-        imageDiv.append(pThree);
-        var ingredients = snapshot.val().ingredients;
-        var measurements = snapshot.val().measurements;
-        var recipe = $("<div>");
-        recipe.attr("id", "recipe");
-        for (let i = 0; i < ingredients.length; i++) {
-            $(recipe).append(measurements[i] + " " + ingredients[i] + ", ");  
-        }
-        imageDiv.append(recipe);
-        var pFive = $("<p>").text("Instructions: " + snapshot.val().instructions);
-        imageDiv.append(pFive);
-        $("#food-drink-view").prepend(imageDiv);
+    var results = snapshot.val().results;
+    var searchItem = snapshot.val().SearchTerm
+    console.log([Object.keys(results[0])[1]]);
+    if ([Object.keys(results[0])[1]] == "drinkName") {
+        $("#drink-history").append("<li> " + searchItem + "</li>");
     } else {
-        var imageDiv = $('<div>');
-        imageDiv.addClass('imgClass');
-
-        // Make an image div
-        var image = $("<img>");
-        image.attr("src", snapshot.val().image);
-        var pOne = $("<p>").text("Dish Name: " + snapshot.val().dishName);
-        imageDiv.append(pOne);
-        imageDiv.append(image);
-        var pTwo = $("<p>").text("Ingredients: " + snapshot.val().ingredients);
-        imageDiv.append(pTwo);
-        var pThree = $("<p>").text("Calories: " + snapshot.val().calories);
-        imageDiv.append(pThree);
-        var pFour = $("<p>").text("Weight: " + snapshot.val().weight);
-        imageDiv.append(pFour);
-        $("#food-drink-view").prepend(imageDiv);
+        $("#dish-history").append("<li> " + searchItem + "</li>");
     }
+
+    results.forEach(element => {   
+        if ([Object.keys(element)[1]] == "drinkName") {
+            var imageDiv = $('<div>');
+            imageDiv.addClass('imgClass');
+            // Make an image div
+            var image = $("<img>");
+            image.attr("src", element.picture);
+            var pOne = $("<p>").text("Drink-ID: " + element.ID);
+            var pTwo = $("<p>").text("Drink: " + element.drinkName);
+            pTwo.attr("id", "item-name");
+            imageDiv.append(pTwo);
+            imageDiv.append(image);
+            imageDiv.append(pOne);
+            var pThree = $("<p>").text("Alcohol: " + element.type);
+            imageDiv.append(pThree);
+            var ingredients = element.ingredients;
+            var measurements = element.measurements;
+            var recipe = $("<ul>");
+            recipe.attr("id", "recipe");
+            for (let i = 0; i < ingredients.length; i++) {
+                $(recipe).append("<li>" + measurements[i] + " " + ingredients[i] + "</li>");  
+            }
+            imageDiv.append(recipe);
+            var pFive = $("<p>").text("Instructions: " + element.instructions);
+            imageDiv.append(pFive);
+            $("#food-drink-view").prepend(imageDiv);
+        } else {
+            var imageDiv = $('<div>');
+            imageDiv.addClass('imgClass');
+
+            // Make an image div
+            var image = $("<img>");
+            image.attr("src", element.image);
+            var pOne = $("<p>").text("Dish Name: " + element.dishName);
+            pOne.attr("id", "item-name");
+            imageDiv.append(pOne);
+            imageDiv.append(image);
+            var pTwo = $("<ul>");
+            var ingredients = element.ingredients;
+            for (let i = 0; i < ingredients.length; i++) {
+                $(pTwo).append("<li> -" + ingredients[i] + "</li>");  
+            }
+            imageDiv.append(pTwo);
+            var pThree = $("<p>").text("Calories: " + element.calories);
+            imageDiv.append(pThree);
+            var pFour = $("<p>").text("Weight: " + element.weight);
+            imageDiv.append(pFour);
+            $("#food-drink-view").prepend(imageDiv);
+        }
+    });
+})
+
+$("#dish-div").on("click", function() {
+    if (!dishHist) {
+        $("#dish-history").show();
+        dishHist = true;
+    } else {
+        $("#dish-history").hide();
+        dishHist = false;
+    }
+    
+})
+
+$("#drink-div").on("click", function() {
+    if (!drinkHist) {
+        $("#drink-history").show();
+        drinkHist = true;
+    } else {
+        $("#drink-history").hide();
+        drinkHist = false;
+    }   
 })
