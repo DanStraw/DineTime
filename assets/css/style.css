@@ -12,7 +12,10 @@
         0% { transform: rotateY(0deg); }
         100% { transform: rotateY(360deg); }
     } */
-
+#headline{
+    color: white;
+    text-align: center;
+}
     
 .card {
     background-color: #f2f2f2;
