@@ -41,6 +41,8 @@ body{
     background-color: honeydew;
 }
 
+
+
 /* #food-input,
 #drink-input:active {
     outline: none;
@@ -197,21 +199,16 @@ aside {
 }
 /* Search Buttons */
 
-#search-food {
+#search-food, #search-drink  {
     color: white;
     background-color: darkblue;
     border-radius: 75px;
+    margin-top: 10px;
 }
 
 #search-food:hover {
     background-image: url("../images/food.jpeg");
     background-size: 70px 40px;
-}
-
-#search-drink {
-    color: white;
-    background-color: darkblue;
-    border-radius: 75px;
 }
 
 #search-drink:hover {

@@ -1,386 +1,82 @@
 $("#food-drink-view").hide();
-// Initialize Firebase
-var config = {
-    apiKey: "AIzaSyDFxvI2pF2TVAL8YxlTKiIJsA3zAT8wT1I",
-    authDomain: "dinetime-c2874.firebaseapp.com",
-    databaseURL: "https://dinetime-c2874.firebaseio.com",
-    projectId: "dinetime-c2874",
-    storageBucket: "",
-    messagingSenderId: "647476940046"
-};
-firebase.initializeApp(config);
-var database = firebase.database();
 $("#drink-history").hide();
 $("#dish-history").hide();
-var drinkHist = false;
-var dishHist = false;
-var storedDrinks = [];
-var storedDishes = [];
-// Food Search
-$("#search-food").on("click", function (event) {
-    event.preventDefault();
-    var food = $("#food-input").val().trim();
-    var ingredient = $("#ingredient").val().trim();
-    if (food ==="" && ingredient === "") {
-        swal("You left the search box empty");
-        return false;
-    } else if ((storedDishes.indexOf(food) > -1) || (storedDishes.indexOf(ingredient) > -1)) {
-        swal(`${food} is already in search history`)
-        $("#ingredient").val("")
-        $("#food-input").val("")
-        return false;
-    } else if (food !=="" || ingredient !== "") {
-        $("#food-input").val("")
-        foodSearch(food);
-        $("#ingredient").val("")
-        foodSearch(ingredient);   
-    //alert if search box empty
-    } 
-}) // End of $("#search-food").on("click", function (event) {}
-// Drink Search
-$("#search-drink").on("click", function (event) {
-    event.preventDefault();
-    var drink = $("#drink-input").val().trim();
-    if (storedDrinks.indexOf(drink) > -1){
-        swal(`${drink} is already in search history`);
-        $("#drink-input").val("");
-        return false;
-    } else if (drink !== "") {
-        $("#drink-input").val("")
-        drinkSearch(drink);
-    }
-    //alert if search box empty
-    else {
-        swal("You left the search box empty");
-    }
-}) // End of $("#search-food").on("click", function (event) {}
-// Food search function
-function foodSearch(food) {
-    $("#food-drink-view").empty();
-    $("#food-drink-view").show();
-    var API_KEY = "bf3c7683b861847f86f4ee05390e4c05";
-    var APP_ID = "b81e67c4";
-    var corsProxy = "https://cors-anywhere.herokuapp.com/"; 
-    var apiUrl = "https://api.edamam.com/search?app_id=" + APP_ID + "&app_key=" + API_KEY + "&q=" + food;
-    var searchTermURL =  corsProxy + apiUrl;
-    $.ajax({
-        url: searchTermURL,
-        method: 'GET',
-    }).then(function (data) {
-        if (data.q !== "") {
-            if (data.hits.length === 0) {
-                swal(`Search of ${food} returned no results`);
-                return false;
-            } else {
-                $("#food-drink-view").empty();
-                var results = [];
-                for (var i = 0; i < data.hits.length; i++) {
-                    var resultItem = {
-                        image: data.hits[i].recipe.image,
-                        dishName: data.hits[i].recipe.label,
-                        ingredients: data.hits[i].recipe.ingredientLines,
-                        calories: data.hits[i].recipe.calories,
-                        recipe: data.hits[i].recipe.url,
-                    }
-                    results.push(resultItem);
-                }
-                var foodArray = food.split("");
-                for (let i = 0; i < foodArray.length; i++) {
-                    if (foodArray[i] === " ") {
-                        foodArray.splice(i, 1);    
-                    }   
-                }
-                var foodID = foodArray.join("")
-                database.ref('food' + foodID).set({
-                    searchTerm: food,
-                    results: results,
-                });
-            }
-        }       
-    })
-} //  End of function foodSearch(food){}
-// Drink search function
-function drinkSearch(drink) {
-    $("#food-drink-view").empty();
-    $("#food-drink-view").show();
-    var searchTermURL = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + drink;
-    // API response function
-    $.ajax({
-        url: searchTermURL,
-        method: 'GET',
-    }).then(function (response) {
-        if (response.drinks === null) {
-            swal(`Search of ${drink} returned no results`);
-            return false;
-        } else {
-            var results = [];
-            for (var i = 0; i < response.drinks.length; i++) {
-                var drinkObj = response.drinks[i];
-                var ingredients = [];
-                var measurements = [];
-                for (var j = 9; j < 23; j++) {
-                    var ingredient = drinkObj[Object.keys(drinkObj)[j]];
-                    var measurement = drinkObj[Object.keys(drinkObj)[j + 15]];
-                    if (ingredient !== "") {
-                        ingredients.push(ingredient);
-                        measurements.push(measurement);
-                    }
-                }
-                var resultItem = {
-                    drinkName: drinkObj.strDrink,
-                    ID: drinkObj.idDrink,
-                    ingredients: ingredients,
-                    measurements: measurements,
-                    type: drinkObj.strAlcoholic,
-                    picture: drinkObj.strDrinkThumb,
-                    instructions: drinkObj.strInstructions,
-                }
-                results.push(resultItem);
-            }
-            var drinkArray = drink.split("");
-                for (let i = 0; i < drinkArray.length; i++) {
-                    if (drinkArray[i] === " ") {
-                        drinkArray.splice(i, 1);    
-                    }   
-            }
-            var drinkID = drinkArray.join("")
-            database.ref(`drink${drinkID}`).set({
-                searchTerm: drink,
-                results: results,
-            });
-        }
-    })
-     // End of the response function
-} //  End of function foodSearch(food){}
-database.ref().on("child_added", function (snapshot) {
-    var results = snapshot.val().results;
-    var resultsView = $('<div>');
-    var searchTerm = snapshot.val().searchTerm;
-    var histItem = $("<li>");
-    var searchTermDiv = $('<div>');
-        searchTermDiv.append(searchTerm);
-        searchTermDiv.addClass('history');
-    var searchTermArray = searchTerm.split("");
-        for (let i = 0; i < searchTermArray.length; i++) {
-            if (searchTermArray[i] === " ") {
-                searchTermArray.splice(i, 1);    
-            }   
-        }
-    var termID = searchTermArray.join("");
-    resultsView.attr("id", termID);
-    
-    histItem.attr("id", termID + "histdiv");
-    if ([Object.keys(results[0])[1]] == "drinkName") {
-        searchTermDiv.attr({"id": termID + "-hist", "value": "drink"})
-        storedDrinks.push(searchTerm);
-    } else {
-        searchTermDiv.attr({"id": termID + "-hist", "value": "dish"})
-        storedDishes.push(searchTerm);   
-    }
-    var deleteButton = $("<button>")
-        deleteButton.addClass("delete");
-        deleteButton.attr("value", snapshot.key);
-        deleteButton.append("x");
-        histItem.append(searchTermDiv);
-        histItem.append(deleteButton);
-    if ([Object.keys(results[0])[1]] == "drinkName") {    
-        $("#drink-history").append(histItem);
-    } else {
-        $("#dish-history").append(histItem);
-    }
-    
-    results.forEach(element => {
-        if ([Object.keys(element)[1]] == "drinkName") {
-            var imageDiv = $('<div>');
-            var resultCount = 0;
-            imageDiv.addClass('imgClass');
-            // Make an image div
-            var image = $("<img>");
-            image.attr("src", element.picture);
-            image.addClass('photo');
-            // var pOne = $("<p>").text("Drink-ID: " + element.ID);
-            var pTwo = $("<h3>").text(element.drinkName);
-            pTwo.attr("id", "item-name");
-            pTwo.addClass('drink-name')
-            imageDiv.append(pTwo);
-            imageDiv.append(image);
-            imageDiv.append(pOne);
-            var pThree = $("<p>").text(element.type);
-            imageDiv.append(pThree);
-            var ingredients = element.ingredients;
-            var measurements = element.measurements;
-            var recipe = $("<ul>");
-            recipe.attr("id", "recipe");
-            for (let i = 0; i < ingredients.length; i++) {
-                $(recipe).append("<li>" + measurements[i] + " " + ingredients[i] + "</li>");
-            }
-            recipe.addClass('recipe');
-            imageDiv.append(recipe);  
-            var pFive = $("<p>").text("Instructions: " + element.instructions);
-            pFive.attr("id", "instructions")
-            imageDiv.append(pFive);
-            resultsView.append(imageDiv);
-            $("#food-drink-view").prepend(resultsView);
-        } else {
-            var imageDiv = $('<div>');
-            imageDiv.addClass('imgClass');
-            // Make an image div
-            var image = $("<img>");
-            image.attr("src", element.image);
-            var pOne = $("<h3>").text(element.dishName);
-            pOne.addClass('dishName');          
-            pOne.attr("id", "item-name");
-            imageDiv.append(pOne);
-            imageDiv.append(image);
-            imageDiv.append(pSix);
-            var pThree = $("<h4>").text("Calories: " + Math.round(element.calories));
-            pThree.addClass('calories');
-            imageDiv.append(pThree);
-            var pTwo = $("<ul>");
-            pTwo.addClass('list');
-            var ingredients = element.ingredients;
-            for (let i = 0; i < ingredients.length; i++) {
-                $(pTwo).append("<li> -" + ingredients[i] + "</li>");
-            }
-            imageDiv.append(pTwo);
-            var pSix = $('<a>');
-            pSix.append("Link to Recipe");
-            pSix.attr({'href': element.recipe, "title": element.dishName + " Recipe"});
-            imageDiv.append(pSix);
-            resultsView.append(imageDiv);
-            $("#food-drink-view").prepend(imageDiv);
-        }
-    });
-})
-$("#dish-div").on("click", function () {
-    if (!dishHist) {
-        $("#dish-history").show();
-        dishHist = true;
-    } else {
-        $("#dish-history").hide();
-        dishHist = false;
-    }
-})
-$("#drink-div").on("click", function () {
-    if (!drinkHist) {
-        $("#drink-history").show();
-        drinkHist = true;
-    } else {
-        $("#drink-history").hide();
-        drinkHist = false;
-    }
-});
 
-function deleteHistory() {
-    var key = $(this)[0].value;
-    database.ref().child(key).remove();
+var config = keys.firebase_config;
+firebase.initializeApp(config);
+var database = firebase.database();
+
+const clearInputFields = function () {
+    // $("#ingredient").val("");
+    $("#food-input").val("");
+    $("#drink-input").val("");
 }
 
-database.ref().on('child_removed', function (snapshot) {
-    var deletedTerm = snapshot.val().searchTerm;
-    var result1 = snapshot.val().results[0];
-    if ([Object.keys(result1)[1]] == "drinkName") {
-        storedDrinks.splice(storedDrinks.indexOf(deletedTerm), 1);
-    } else {
-        storedDishes.splice(storedDishes.indexOf(deletedTerm), 1);
-    }
-    var deletedTermArray = deletedTerm.split("");
-        for (let i = 0; i < deletedTermArray.length; i++) {
-            if (deletedTermArray[i] === " ") {
-                deletedTermArray.splice(i, 1);    
-            }   
+const resetResultsView = function () {
+    $("#food-drink-view").empty();
+    $("#food-drink-view").show();
+}
+
+const types = ['food', 'drink'];
+types.forEach(type => {
+    $(`#search-${type}`).on("click", function (event) {
+        event.preventDefault();
+        var term = $(`#${type}-input`).val().trim();
+        if (term === "") {
+            clearInputFields();
+            return swal("You left the search box empty");
+        } else {
+            clearInputFields();
+            type === 'food' ? foodSearch(term, type) : drinkSearch(term, type);
         }
-    var deletedID = deletedTermArray.join("");
+    })
+});
+
+function searchRecipes(term, type) {
+    resetResultsView();
+    let search = new Search(term, type);
+    if (search.findItem()) {
+        return swal(`${food} is already in food search history`)
+    };
+    type === 'food' ? search.dish() : search.drink();
+}
+
+database.ref().on("child_added", function (snapshot) {
+    const historyItem = new HistoryItem(snapshot.val().searchTerm, removeSpaces(snapshot.val().searchTerm), snapshot.val().type, snapshot.val().results);
+    historyItem.display();
+    historyItem.showRecipes();
+});
+
+const toggleHistoryList = function (id) {
+    $(id).is(":visible") ? $(id).hide() : $(id).show();
+}
+
+$("#dish-div").on("click", function () {
+    toggleHistoryList(`#${$('#dish-div').attr("value")}`);
+})
+$("#drink-div").on("click", function () {
+    toggleHistoryList(`#${$('#drink-div').attr("value")}`);
+});
+
+database.ref().on('child_removed', function (snapshot) {
+    var deletedID = removeSpaces(snapshot.val().searchTerm);
     $("#" + deletedID).empty();
     $("#" + deletedID + "histdiv").empty();
 })
 
-function showHistoryItem() {
-    $("#food-drink-view").empty();
-    $("#food-drink-view").show();
-    var id = $(this).attr("id");
-    
-    var value = $(this).attr("value");
-    var idSplit = id.split("");
-    idSplit.pop(); idSplit.pop(); idSplit.pop(); idSplit.pop(); idSplit.pop();
-    var searchTerm = idSplit.join("");
-    if (value === "dish") {
-        searchTerm = "food" + searchTerm;
-    } else {
-        searchTerm = "drink" + searchTerm;
-    }
+function deleteHistory() {
+    const historyItem = new HistoryItem(null, removeSpaces($(this)[0].value), null);
+    historyItem.delete();
+}
+
+function showHistoryItemRecipes() {
+    resetResultsView();
+    var searchTerm = $(this).text().trim();
     database.ref(searchTerm).on("value", function (snapshot) {
-        var results = snapshot.val().results;
-        var resultsView = $('<div>');
-        var searchTerm = snapshot.val().searchTerm;
-        var searchTermDiv = $('<div>');
-        searchTermDiv.append(searchTerm);
-        searchTermDiv.addClass('history');
-        var searchTermArray = searchTerm.split("");
-        for (let i = 0; i < searchTermArray.length; i++) {
-            if (searchTermArray[i] === " ") {
-                searchTermArray.splice(i, 1);  
-                  
-            }
-        }
-        var termID = searchTermArray.join("");
-        resultsView.attr("id", termID);
-        results.forEach(element => {
-            if ([Object.keys(element)[1]] == "drinkName") {
-                var imageDiv = $('<div>');
-                imageDiv.addClass('imgClass');
-                // Make an image div
-                var image = $("<img>");
-                image.attr({"src": element.picture});
-                var pTwo = $("<h3>").text(element.drinkName);
-                pTwo.attr("id", "item-name");
-                imageDiv.append(pTwo);
-                imageDiv.append(image);
-                imageDiv.append(pOne);
-                var pThree = $("<p>").text("Alcohol: " + element.type);
-                imageDiv.append(pThree);
-                var ingredients = element.ingredients;
-                var measurements = element.measurements;
-                var recipe = $("<ul>");
-                recipe.attr("id", "recipe");
-                for (let i = 0; i < ingredients.length; i++) {
-                    $(recipe).append("<li>" + measurements[i] + " " + ingredients[i] + "</li>");
-                }
-                imageDiv.append(recipe);
-                var pFive = $("<p>").text("Instructions: " + element.instructions);
-                pFive.attr("id", "instructions");
-                imageDiv.append(pFive);
-                resultsView.append(imageDiv);
-                $("#food-drink-view").prepend(resultsView);
-            } else {
-                var imageDiv = $('<div>');
-                imageDiv.addClass('imgClass');     
-                // Make an image div       
-                var image = $("<img>");
-                image.attr("src", element.image);
-                var pOne = $("<h3>").text(element.dishName);
-                pOne.attr("id", "item-name");
-                imageDiv.append(pOne);
-                imageDiv.append(image);
-                var pThree = $("<h4>").text("Calories: " + Math.round(element.calories));
-                imageDiv.append(pThree);
-                var pTwo = $("<ul>");
-                var ingredients = element.ingredients;
-                for (let i = 0; i < ingredients.length; i++) {
-                    $(pTwo).append("<li> -" + ingredients[i] + "</li>");
-                }
-                imageDiv.append(pTwo);  
-                var pSix = $('<a>');
-                pSix.append("Link to Recipe");
-                pSix.attr({'href': element.recipe, "title": element.dishName + " Recipe"});
-                imageDiv.append(pSix);      
-                resultsView.append(imageDiv);
-                $("#food-drink-view").prepend(resultsView);
-            }
-        });
+        const historyItem = new HistoryItem(searchTerm, removeSpaces(searchTerm), null, snapshot.val().results);
+        historyItem.showRecipes();
     })
 }
-$(document).on("click", ".history", showHistoryItem);
+
+$(document).on("click", ".history", showHistoryItemRecipes);
 $(document).on("click", ".delete", deleteHistory);
-
-
