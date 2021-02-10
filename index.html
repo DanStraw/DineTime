@@ -45,31 +45,67 @@
 
         <div class="row">
             <div class="col-sm-9">
-                <br>
-                <!-- First panel is for handling the search parameters -->
-                <div class="panel panel-primary" id="food-panel">
-                    <div class="panel-heading" id="food-panel-heading">
-                        <h3 class="panel-title" id="food-recipe">
-                            <strong>
-                                <i class="fa  fa-list-alt"></i> Food Recipe</strong>
-                        </h3>
+                <div class="row">
+                    <div class="col-md">
+                        <div class="panel panel-primary" id="food-panel">
+                            <div class="panel-heading" id="food-panel-heading">
+                                <h3 class="panel-title" id="food-recipe">
+                                    <strong>
+                                        <i class="fa  fa-list-alt"></i> Food Recipe</strong>
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                <form role="form">
+                                    <label for="food-input">Recipe Name</label>
+                                    <input type="text" class="form-control" id="food-input">
+                                    <button type="submit" class="btn btn-default" id="search-food">
+                                        <i class="fa fa-search"></i> Submit
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <div class="panel-body">
-                        <h2> Search by Recipe Name</h2>
-                        <!-- Here we create an HTML Form for handling the inputs-->
-                        <form role="form">
-                            <label for="food-input">Recipe Name</label>
-                            <input type="text" class="form-control" id="food-input">
-                            <button type="submit" class="btn btn-default" id="search-food">
-                                <i class="fa fa-search"></i> Submit</button>
-                        </form>
+
+                    <div class="col-md">
+                        <div class="panel panel-primary" id="drink-panel">
+                            <div class="panel-heading" id="drink-panel-heading">
+                                <h3 class="panel-title" id="drink-recipe">
+                                    <strong>
+                                        <i class="fa  fa-glass"></i> Drink Recipe</strong>
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                <form role="form">
+                                    <label for="drink-input">Drink Name</label>
+                                    <input type="text" class="form-control" id="drink-input">
+                                    <button type="submit" class="btn btn-default" id="search-drink">
+                                        <i class="fa fa-search"></i> Submit
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="panel panel-primary" id="results-panel">
+                            <div class="panel-heading" id="results-panel-heading">
+                                <h3 class="panel-title" id="results-title">
+                                    <strong>
+                                        <i class="fa fa-table"></i> Top Results</strong>
+                                </h3>
+                            </div>
+                            <div class="panel-body col" id="food-drink-view"></div>
+                            <br>
+                            <hr>
+                        </div>
                     </div>
                 </div>
 
             </div>
-            <!-- Here we create a history panel -->
+
             <div class="col-md-3">
-                <br>
                 <aside class="panel panel-primary" id="history-panel">
                     <div class="panel-heading" id="history-panel-heading">
                         <h3>Search History</h3>
@@ -86,56 +122,9 @@
             </div>
 
         </div>
-        <!-- </div> -->
-
-        <div class="row">
-            <div class="col-sm-9">
-                <br>
-                <!-- Second panel is for searching for drinks -->
-                <div class="panel panel-primary" id="drink-panel">
-                    <div class="panel-heading" id="drink-panel-heading">
-                        <h3 class="panel-title" id="drink-recipe">
-                            <strong>
-                                <i class="fa  fa-glass"></i> Drink Recipe</strong>
-                        </h3>
-                    </div>
-                    <div class="panel-body">
-
-                        <!-- Here we create an HTML Form for handling the inputs-->
-                        <form role="form">
-                            <!-- This is the input box for drink name -->
-                            <form class="form-group">
-                                <label for="drink-input">Drink Name</label>
-                                <input type="text" class="form-control" id="drink-input">
-                                <button type="submit" class="btn btn-default" id="search-drink">
-                                    <i class="fa fa-search"></i> Submit</button>
-                            </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     </div>
 
-    <!-- Panel Heading for the retrieved articles box -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-9">
-                <div class="panel panel-primary" id="results-panel">
-                    <div class="panel-heading" id="results-panel-heading">
-                        <h3 class="panel-title" id="results-title">
-                            <strong>
-                                <i class="fa fa-table"></i> Top Results</strong>
-                        </h3>
-                    </div>
-                    <div class="panel-body" id="food-drink-view"></div>
-                    <br>
-                    <hr>
-                </div>
-            </div>
-        </div>
 
-    </div>
     <div class="footer">
         <div class="p"> This Wesbite Was Created By: Steven Mezzacappa, Daniel Strawbridge, &amp; Mohammad Soheili
         </div>

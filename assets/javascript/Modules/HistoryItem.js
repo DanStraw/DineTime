@@ -28,9 +28,9 @@ class HistoryItem {
 
   showRecipes() {
     var resultsView = $('<div>');
-    resultsView.attr("id", this.id);
-    this.results.forEach(result => {
-      const recipe = new Recipe(result);
+    resultsView.attr({ "id": this.id, "class": "row" });
+    this.results.forEach((result, index) => {
+      const recipe = new Recipe(this.term, result, index);
       resultsView.append(recipe.display());
       $("#food-drink-view").prepend(resultsView);
       autoScroll(document.querySelector("#results-panel"));

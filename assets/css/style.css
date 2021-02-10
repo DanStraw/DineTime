@@ -100,6 +100,9 @@ img {
     box-shadow: 0 8px 16px -6px black;
     border: none;
 }
+#history-panel {
+    width: 100%;
+}
 
 #drink-panel-heading {
     background-image: url("../images/drinks-panel.jpg");
@@ -241,36 +244,17 @@ aside {
     float: left;
 }
 
-.imgClass {
+.resultItem {
     border:black solid;
     width: auto;
     height: auto;
-    float: left;
     padding: 5px;
-    margin: 5px;
+    margin-left: 30px;
+    margin-bottom: 5px;
     border-radius: 10px;
 }
 
 #instructions {
     width: 200px;
     height: auto;
-}
-
-/* .list{
-float: left;
-} */
-.recipeUrl{
-
-}
-.dishName{
-
-}
-.drink-name{
-
-}
-.photo{
-
-}
-.calories{
-
 }

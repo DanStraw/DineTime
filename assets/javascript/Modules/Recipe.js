@@ -1,6 +1,8 @@
 class Recipe {
-  constructor(data) {
-    this.data = data
+  constructor(term, data, index) {
+    this.term = term;
+    this.data = data;
+    this.index = index;
   }
 
   addInfo(_type, _html_attr, _text) {
@@ -29,9 +31,13 @@ class Recipe {
   }
 
   display() {
-    let imageDiv = this.addInfo('<div>', { "class": 'imgClass' });
+    const deleteVal = removeSpaces(this.term);
+    let resultDiv = this.addInfo('<div>', { "class": 'resultItem col-md-5 offset-md-1' });
+    const headerRow = this.addInfo('<div>', { "class": "row" }, null);
+    var heading = this.addInfo("<h3>", { "id": "item-name", 'class': 'col-md-9' }, this.data.drinkName || this.data.strDrink || this.data.label || this.data.dishName);
+    const deleteButton = this.addInfo('<button>', { 'class': 'col-md-2 delete-item', 'value': deleteVal + "-" + this.index }, 'X');
     var image = this.addInfo("<img>", { "src": this.data.picture || this.data.image || this.data.strDrinkThumb })
-    var heading = this.addInfo("<h3>", { "id": "item-name" }, this.data.drinkName || this.data.strDrink || this.data.label || this.data.dishName);
+
 
     //set ingredient and measurements
     if (!this.data.ingredients && !this.data.ingredientLines) {
@@ -54,12 +60,13 @@ class Recipe {
     const instruction_attributes = this.data.strInstructions ? { "id": "instructions" } : { "id": "instructions", "href": (this.data.recipe || this.data.url), "title": this.data.dishName + " Recipe" };
     var instructions = this.addInfo((this.data.strInstructions ? "<p>" : "<a>"), instruction_attributes, (!this.data.strInstructions ? "Link to Recipe" : this.data.strInstructions));
 
-    imageDiv.append(heading);
-    imageDiv.append(image);
-    imageDiv.append(recipe);
-    imageDiv.append(misc);
-    imageDiv.append(instructions);
+    headerRow.append(heading); // .append(deleteButton);
+    resultDiv.append(headerRow);
+    resultDiv.append(image);
+    resultDiv.append(recipe);
+    resultDiv.append(misc);
+    resultDiv.append(instructions);
 
-    return imageDiv;
+    return resultDiv;
   }
 }

@@ -72,7 +72,7 @@ function deleteHistory() {
 function showHistoryItemRecipes() {
     resetResultsView();
     var searchTerm = $(this).text().trim();
-    database.ref(searchTerm).on("value", function (snapshot) {
+    database.ref(removeSpaces(searchTerm)).on("value", function (snapshot) {
         const historyItem = new HistoryItem(searchTerm, removeSpaces(searchTerm), null, snapshot.val().results);
         historyItem.showRecipes();
     })
@@ -80,3 +80,7 @@ function showHistoryItemRecipes() {
 
 $(document).on("click", ".history", showHistoryItemRecipes);
 $(document).on("click", ".delete", deleteHistory);
+$(document).on("click", ".delete-item", function () {
+    const itemToDelete = $(this);
+    console.log(itemToDelete.val());
+});
