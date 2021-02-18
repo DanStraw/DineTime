@@ -29,6 +29,7 @@ class HistoryItem {
   showRecipes() {
     var resultsView = $('<div>');
     resultsView.attr({ "id": this.id, "class": "row" });
+    if (!this.results) return null;
     this.results.forEach((result, index) => {
       const recipe = new Recipe(this.term, result, index);
       resultsView.append(recipe.display());

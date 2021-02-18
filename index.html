@@ -26,6 +26,7 @@
     <!-- Add a link to AOS-CSS Library -->
     <link href="https://cdn.rawgit.com/michalsnik/aos/2.1.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://developer.edamam.com/attribution/badge.js"></script>
 </head>
 <!--start of body-->
 
@@ -53,14 +54,32 @@
                                     <strong>
                                         <i class="fa  fa-list-alt"></i> Food Recipe</strong>
                                 </h3>
+                                <div id="food-select">
+                                    Search By: <select name="dish-search-type" id="dish-type-select">
+                                        <option value="dish-name" selected>Recipe Name</option>
+                                        <option value="ingredients">Ingredients</option>
+                                    </select>
+                                </div>
+
                             </div>
-                            <div class="panel-body">
+                            <div class="panel-body" id='food-recipe-search'>
                                 <form role="form">
                                     <label for="food-input">Recipe Name</label>
                                     <input type="text" class="form-control" id="food-input">
                                     <button type="submit" class="btn btn-default" id="search-food">
                                         <i class="fa fa-search"></i> Submit
                                     </button>
+                                </form>
+                            </div>
+                            <div class="panel-body" id="food-ingredients-search">
+                                <form role="form">
+                                    <label for="ingredient-input">Add Ingredients</label>
+                                    <input type="text" class="form-control" id="ingredient-input">
+                                    <div id="ingredients-list"></div>
+                                    <button type="submit" class="btn btn-default" id="add-ingredient">Add
+                                        Ingredient</button>
+                                    <button type="submit" class="btn btn-default" id="ingredients-search">Search with
+                                        these Ingredients</button>
                                 </form>
                             </div>
                         </div>
@@ -119,19 +138,24 @@
                         <ul id="drink-history"></ul>
                     </div>
                 </aside>
+
+
+                <div class="col-md-2">
+                    <div id="edamam-badge" data-color="white"></div>
+                </div>
+
             </div>
 
         </div>
     </div>
 
 
-    <div class="footer">
+    <div class="footer ">
         <div class="p"> This Wesbite Was Created By: Steven Mezzacappa, Daniel Strawbridge, &amp; Mohammad Soheili
         </div>
         <div class="p">
             Eat Well, Drink Well.</div>
     </div>
-
 
     <!-- Add to the Bootstrap-JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
@@ -161,6 +185,7 @@
     <script type="text/javascript" src="assets/javascript/Modules/Recipe.js"></script>
     <script type="text/javascript" src="assets/javascript/Modules/RecipeView.js"></script>
     <script type="text/javascript" src="assets/javascript/Modules/Search.js"></script>
+    <script type="text/javascript" src="assets/javascript/Modules/IngredientsView.js"></script>
     <script type="text/javascript" src="assets/javascript/Services/FirebaseService.js"></script>
     <script type="text/javascript" src="assets/javascript/Modules/HistoryItem.js"></script>
     <script type="text/javascript" src="assets/javascript/java.js"></script>

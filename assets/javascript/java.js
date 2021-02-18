@@ -1,13 +1,17 @@
 $("#food-drink-view").hide();
 $("#drink-history").hide();
 $("#dish-history").hide();
+$("#food-ingredients-search").hide();
 
 var config = keys.firebase_config;
 firebase.initializeApp(config);
+
 var database = firebase.database();
 
+const ingredientSearch = new Search(null, 'ingredient');
+
 const clearInputFields = function () {
-    // $("#ingredient").val("");
+    $("#ingredient-input").val("");
     $("#food-input").val("");
     $("#drink-input").val("");
 }
@@ -27,7 +31,7 @@ types.forEach(type => {
             return swal("You left the search box empty");
         } else {
             clearInputFields();
-            type === 'food' ? foodSearch(term, type) : drinkSearch(term, type);
+            searchRecipes(term, type);
         }
     })
 });
@@ -58,6 +62,15 @@ $("#drink-div").on("click", function () {
     toggleHistoryList(`#${$('#drink-div').attr("value")}`);
 });
 
+$("#add-ingredient").on('click', function (event) {
+    event.preventDefault();
+    let ingredient = $('#ingredient-input');
+    ingredientSearch.addIngredient(ingredient[0].value);
+    let ingredientsView = new IngredientsView(ingredientSearch.ingredients);
+    ingredientsView.showIngredients();
+    $('#ingredient-input').empty();
+})
+
 database.ref().on('child_removed', function (snapshot) {
     var deletedID = removeSpaces(snapshot.val().searchTerm);
     $("#" + deletedID).empty();
@@ -81,6 +94,28 @@ function showHistoryItemRecipes() {
 $(document).on("click", ".history", showHistoryItemRecipes);
 $(document).on("click", ".delete", deleteHistory);
 $(document).on("click", ".delete-item", function () {
-    const itemToDelete = $(this);
-    console.log(itemToDelete.val());
+    let itemToDelete = $(this).val();
+    const [key, index] = itemToDelete.split("-");
+    const itemDeleteService = new FirebaseService({ key, index });
+    itemDeleteService.findSearchResults();
+    itemDeleteService.deleteRecipe();
+    $("#food-drink-view").empty();
+    itemDeleteService.saveResults();
 });
+
+$('#dish-type-select').change(function () {
+    console.log('select changed');
+    console.log($(this).val());
+    switch ($(this).val()) {
+        case 'ingredients':
+            $('#food-recipe-search').hide();
+            $('#food-input').empty();
+            $("#food-ingredients-search").show();
+            break;
+        default:
+            $('#food-ingredients-search').hide();
+            $('#ingredient-input').empty();
+            $("#food-recipe-search").show();
+            break;
+    }
+})

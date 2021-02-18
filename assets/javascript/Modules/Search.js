@@ -2,6 +2,7 @@ class Search {
   constructor(term, type) {
     this.term = term;
     this.type = type;
+    this.ingredients = [];
     this.results = [];
   }
 
@@ -15,6 +16,14 @@ class Search {
       }
     })
     return found;
+  }
+
+  addIngredient(ingredient) {
+    this.ingredients.push(ingredient);
+  }
+
+  removeIngredient(index) {
+    this.ingredients.splice(1, index);
   }
 
   getItems() {
@@ -59,7 +68,6 @@ class Search {
     const that = this;
     var API_KEY = keys.dish;
     var APP_ID = keys.dish_id;
-    console.log('...search ' + this.term);
     // var corsProxy = "https://cors-anywhere.herokuapp.com/";
     var apiUrl = "https://api.edamam.com/search?app_id=" + APP_ID + "&app_key=" + API_KEY + "&q=" + this.term;
     // var searchTermURL = apiUrl;

@@ -35,7 +35,7 @@ class Recipe {
     let resultDiv = this.addInfo('<div>', { "class": 'resultItem col-md-5 offset-md-1' });
     const headerRow = this.addInfo('<div>', { "class": "row" }, null);
     var heading = this.addInfo("<h3>", { "id": "item-name", 'class': 'col-md-9' }, this.data.drinkName || this.data.strDrink || this.data.label || this.data.dishName);
-    const deleteButton = this.addInfo('<button>', { 'class': 'col-md-2 delete-item', 'value': deleteVal + "-" + this.index }, 'X');
+    const deleteButton = this.addInfo('<button>', { 'class': 'col-md-2 delete-item btn btn-outline-secondary', 'value': deleteVal + "-" + this.index, 'type': "button", 'data-trigger': "hover", 'data-toggle': 'popover', 'title': `Delete '${heading.text()}' recipe` }, 'X');
     var image = this.addInfo("<img>", { "src": this.data.picture || this.data.image || this.data.strDrinkThumb })
 
 
@@ -60,7 +60,7 @@ class Recipe {
     const instruction_attributes = this.data.strInstructions ? { "id": "instructions" } : { "id": "instructions", "href": (this.data.recipe || this.data.url), "title": this.data.dishName + " Recipe" };
     var instructions = this.addInfo((this.data.strInstructions ? "<p>" : "<a>"), instruction_attributes, (!this.data.strInstructions ? "Link to Recipe" : this.data.strInstructions));
 
-    headerRow.append(heading); // .append(deleteButton);
+    headerRow.append(heading).append(deleteButton);
     resultDiv.append(headerRow);
     resultDiv.append(image);
     resultDiv.append(recipe);
