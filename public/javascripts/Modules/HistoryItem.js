@@ -30,18 +30,22 @@ class HistoryItem {
     var resultsView = $('<div>');
     resultsView.attr({ "id": this.id, "class": "row" });
     if (!this.results) return null;
-    this.results.forEach((result, index) => {
-      const recipe = new Recipe(this.term, result, index);
-      resultsView.append(recipe.display());
-      $("#food-drink-view").prepend(resultsView);
-      autoScroll(document.querySelector("#results-panel"));
-    })
-  }
-
-  delete() {
-    const results = new FirebaseService({
-      key: this.id
-    })
-    results.delete();
+    if (typeof this.results === "object") {
+      for (let result in this.results) {
+        if (this.results[result] !== null) {
+          const recipe = new Recipe(this.term, this.results[result], result);
+          resultsView.append(recipe.display());
+          $("#food-drink-view").prepend(resultsView);
+          autoScroll(document.querySelector("#results-panel"));
+        }
+      }
+    } else {
+      this.results.forEach((result, index) => {
+        const recipe = new Recipe(this.term, result, index);
+        resultsView.append(recipe.display());
+        $("#food-drink-view").prepend(resultsView);
+        autoScroll(document.querySelector("#results-panel"));
+      })
+    }
   }
 }

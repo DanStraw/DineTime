@@ -5,5 +5,5 @@ function removeSpaces(term) {
       term.splice(i, 1);
     }
   }
-  return term.join("")
+  return term.join("");
 }

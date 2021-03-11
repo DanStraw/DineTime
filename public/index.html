@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--HEADER INPUT-->
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Recipes for Food &amp; Drinks! </title>
+  <link rel="icon" type="image/png" sizes="96x96" href="images/favicon.ico">
+
+  <!-- Add a link to reset file -->
+  <link rel="stylesheet" href="stylesheets/reset.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/flatly/bootstrap.min.css">
+
+  <!-- Font Awesome CSS Icons (For cool glyphicons) -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+  <!-- Add a link to the Bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <!-- Add a link to css file -->
+  <link rel="stylesheet" href="stylesheets/style.css">
+
+  <!-- Add a link to AOS-CSS Library -->
+  <link href="https://cdn.rawgit.com/michalsnik/aos/2.1.1/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://developer.edamam.com/attribution/badge.js"></script>
+</head>
+<!--start of body-->
+
+<body>
+
+  <div class="container" id="master">
+
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+        <h1 class="display-4">
+          <b id="headline">Recipes for Food &amp; Drinks!</b>
+        </h1>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+      <div class="col-sm-9">
+        <div class="row">
+          <div class="col-md">
+            <div class="panel panel-primary" id="food-panel">
+              <div class="panel-heading" id="food-panel-heading">
+                <h3 class="panel-title" id="food-recipe">
+                  <strong>
+                    <i class="fa  fa-list-alt"></i> Food Recipe</strong>
+                </h3>
+                <div id="food-select">
+                  Search By: <select name="dish-search-type" id="dish-type-select">
+                    <option value="dish-name" selected>Recipe Name</option>
+                    <option value="ingredients">Ingredients</option>
+                  </select>
+                </div>
+
+              </div>
+              <div class="panel-body" id='food-recipe-search'>
+                <form role="form">
+                  <label for="food-input">Recipe Name</label>
+                  <input type="text" class="form-control" id="food-input">
+                  <button type="submit" class="btn btn-default" id="search-food">
+                    <i class="fa fa-search"></i> Submit
+                  </button>
+                </form>
+              </div>
+              <div class="panel-body" id="food-ingredients-search">
+                <form role="form">
+                  <label for="ingredient-input">Add Ingredients</label>
+                  <input type="text" class="form-control" id="ingredient-input">
+                  <div id="ingredients-list"></div>
+                  <button type="submit" class="btn btn-default" id="add-ingredient">Add
+                    Ingredient</button>
+                  <button type="submit" class="btn btn-default" id="ingredients-search">Search with
+                    these Ingredients</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md">
+            <div class="panel panel-primary" id="drink-panel">
+              <div class="panel-heading" id="drink-panel-heading">
+                <h3 class="panel-title" id="drink-recipe">
+                  <strong>
+                    <i class="fa  fa-glass"></i> Drink Recipe</strong>
+                </h3>
+              </div>
+              <div class="panel-body">
+                <form role="form">
+                  <label for="drink-input">Drink Name</label>
+                  <input type="text" class="form-control" id="drink-input">
+                  <button type="submit" class="btn btn-default" id="search-drink">
+                    <i class="fa fa-search"></i> Submit
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <div class="panel panel-primary" id="results-panel">
+              <div class="panel-heading" id="results-panel-heading">
+                <h3 class="panel-title" id="results-title">
+                  <strong>
+                    <i class="fa fa-table"></i> Top Results</strong>
+                </h3>
+              </div>
+              <div class="panel-body col" id="food-drink-view"></div>
+              <br>
+              <hr>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-md-3">
+        <aside class="panel panel-primary" id="history-panel">
+          <div class="panel-heading" id="history-panel-heading">
+            <h3>Search History</h3>
+          </div>
+          <div id="dish-div" value="dish-history">
+            <h4>Dishes</h4>
+            <ul id="dish-history"></ul>
+          </div>
+          <div>
+            <h4 id="drink-div" value="drink-history">Drinks</h4>
+            <ul id="drink-history"></ul>
+          </div>
+        </aside>
+
+
+        <div class="col-md-2">
+          <div id="edamam-badge" data-color="white"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="footer ">
+    <div class="p"> This Wesbite Was Created By: Steven Mezzacappa, Daniel Strawbridge, &amp; Mohammad Soheili
+    </div>
+    <div class="p">
+      Eat Well, Drink Well.</div>
+  </div>
+
+  <!-- Add to the Bootstrap-JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+  <!-- Add a link to the AOS Library -->
+  <script src="https://cdn.rawgit.com/michalsnik/aos/2.1.1/dist/aos.js"></script>
+
+  <!-- Add a link to the JQuery Library-->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <!-- add firebase link -->
+  <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+  <!-- Add a link to SweetAlert Library -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <!-- Add a link to the javascript file -->
+  <script type="text/javascript" src="javascripts/helpers/string.js"></script>
+  <script type="text/javascript" src="javascripts/helpers/autoscroll.js"></script>
+  <script type="text/javascript" src="javascripts/Modules/Recipe.js"></script>
+  <script type="text/javascript" src="javascripts/Modules/Search.js"></script>
+  <script type="text/javascript" src="javascripts/Modules/IngredientsView.js"></script>
+  <script type="text/javascript" src="javascripts/Modules/HistoryItem.js"></script>
+  <script type="text/javascript" src="javascripts/index.js"></script>
+
+</body>
+
+</html>

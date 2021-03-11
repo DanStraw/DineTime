@@ -18,16 +18,23 @@ class Recipe {
     let list = $('<ol>');
     list.attr("id", _id);
     if (ingredientsLine) {
-      ingredientsLine.forEach(element => {
-        list.append(`<li>${element}</li>`);
-      });
+      if (typeof ingredientsLine === "object") {
+        for (let ingredient in ingredientsLine) {
+          list.append(`<li>${ingredientsLine[`${ingredient}`]}</li>`);
+        }
+      } else {
+        ingredientsLine.forEach(ingredient => {
+          list.append(`<li>${ingredient}</li>`);
+        });
+      }
+      return list;
+    } else if (ingredients) {
+      for (let i = 0; i < ingredients.length; i++) {
+        list.append("<li>" + (measurements[i] || "") + " " + ingredients[i] || (ingredients[`${i}`]["text"] || "") + "</li>");
+      }
       return list;
     }
-
-    for (let i = 0; i < ingredients.length; i++) {
-      list.append("<li>" + (measurements[i] || "") + " " + (ingredients[i] || "") + "</li>");
-    }
-    return list;
+    return null;
   }
 
   display() {
