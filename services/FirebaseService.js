@@ -1,10 +1,5 @@
-var firebase = require('firebase');
-var keys = require('../keys');
-const axios = require('axios');
-var config = keys.firebase_config;
-firebase.initializeApp(config);
-var database = firebase.database();
-
+const admin = require('./fbAdmin');
+const database = admin.database();
 
 class FirebaseService {
   constructor(data) {
@@ -12,7 +7,6 @@ class FirebaseService {
   }
 
   removeSpaces(string) {
-    console.log('string to remove space: ' + string);
     const term = string.split("");
     for (let i = 0; i < term.length; i++) {
       if (term[i] === " ") {
@@ -23,117 +17,108 @@ class FirebaseService {
   }
 
   async saveResults() {
-    let that = this;
     if (!this.data.results) null;
-    var id = this.removeSpaces(this.data.term);
-    return await database.ref(`recipes/${id}`).set({
-      searchTerm: this.data.term,
-      type: this.data.type,
-      results: this.data.results
-    }).then(async function () {
-      that.data.searchKey = id;
-      return await that.getRecipes();
+    if (this.data.uid) delete this.data.uid;
+    return await database.ref(`recipes/${this.removeSpaces(this.data.searchTerm)}`).set(this.data).then(async function () {
+      return true;
     }).catch(function (err) {
-      console.log('err:', err);
+      return false;
     });
   };
 
+  async saveToUserSearches(searchLength, resultsLength) {
+    if (!this.data.uid) null;
+    let resultsIndexes = [];
+    for (let i = 0; i < resultsLength; i++) {
+      resultsIndexes.push(i);
+    }
+    return await database.ref(`users/${this.data.uid}/recipes/${this.data.type}/${searchLength}`).set({
+      searchTerm: this.data.searchTerm,
+      resultsIndexes: resultsIndexes
+    }).then((res) => {
+      return true
+    }).catch(function (err) {
+      console.log("save to user searches err: " + err);
+      return false;
+    });
+  }
+
   async findSearchResults() {
-    if (!this.data.key) null;
-    const keyRef = database.ref(`recipes/${this.data.key}`);
+    if (!this.data.searchTerm) null;
+    const keyRef = database.ref(`recipes/${this.removeSpaces(this.data.searchTerm)}`);
     const that = this;
     await keyRef.on("value", function (snapshot) {
-      that.data.term = snapshot.val().searchTerm;
+      that.data.searchTerm = snapshot.val().searchTerm;
       that.data.type = snapshot.val().type;
       that.data.results = snapshot.val().results;
     })
   }
 
   async deleteSearch() {
-    if (!this.data.term) null;
-    return await database.ref().child(`recipes/${this.removeSpaces(this.data.term)}`).remove().then(function () {
-      return { statusCode: 202 }
-    }).catch(function (err) {
-      console.log('delete err: ' + err);
-      return { statusCode: 404 };
-    });
+    if (!this.data.searchHistoryIndex || !this.data.type || !this.data.uid) null;
+    return await database.ref()
+      .child(`users/${this.data.uid}/recipes/${this.data.type}/${this.data.searchHistoryIndex}`)
+      .remove()
+      .then(function (response) {
+        return { statusCode: 202 };
+      })
+      .catch(function (err) {
+        return err;
+      })
+
   }
 
   async deleteRecipe() {
-    return await database.ref(`recipes/${this.data.key}/results`).child(`${this.data.index}`).remove().then(function () {
-      return {
-        statusCode: 202
-      }
-    }).catch(function () {
-      return {
-        statusCode: 404
-      }
-    })
+    if (!this.data.searchHistroyIndex || !this.data.type || !this.data.uid || !this.data.resultsIndex) null;
+    return await database.ref()
+      .child(`users/${this.data.uid}/recipes/${this.data.type}/${this.data.searchHistroyIndex}/resultsIndexes/${this.data.resultsIndex}`)
+      .remove()
+      .then(function (response) {
+        return { statusCode: 202 };
+      })
+      .catch(function (err) {
+        return err;
+      })
   }
 
-
   async getSearchHistory() {
-    return await database.ref("/recipes").once("value");
+    let recipes = await database.ref(`/users/${this.data.idToken}/recipes`).once("value");
+    return recipes.val();
   }
 
   async getRecipes() {
-    if (!this.data.searchKey) {
+    if (!this.data.searchTerm) {
       return new Error("No search key provided");
     }
-    return await database.ref(`/recipes/${this.data.searchKey}`).once("value");
-  }
 
-  async searchDish() {
-
-    const that = this;
-    const api_key = keys.dish;
-    const api_id = keys.dish_id;
-    const api_url = "https://api.edamam.com/search?app_id=" + api_id + "&app_key=" + api_key + "&q=" + this.data.term;
-    const res = await axios.get(api_url);
-
-    that.data.results = res.data.hits.map(hit => {
-      return {
-        dishName: hit.recipe.label,
-        calories: hit.recipe.calories,
-        ingredientLine: hit.recipe.ingredientLines,
-        ingredients: hit.recipe.ingredients,
-        image: hit.recipe.image,
-        url: hit.recipe.url
-      }
-    });
-
-    return await that.saveResults();
-  }
-
-  async searchDrink() {
-    const that = this;
-    const api_url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + this.data.term;
-    const response = await axios.get(api_url);
-    that.data.results = response.data.drinks;
-  }
-
-
-
-  //getUser() {}
-
-  //addUser() {}
-
-  //deleteUser() {}
-
-  /* 
-  authUser() {
-
-    for firebase auth to secure rules
-    firebase.auth().signInWithEmailAndPassword('test@email.com', 'test123')
-      .then((userCredentials) => {
-        var user = userCredentials;
-        console.log(user);
-      })
-      .catch((error) => {
-        console.log(error.message);
+    let recipes = await database.ref(`/recipes/${this.removeSpaces(this.data.searchTerm)}`).once("value").then((snapshot) => {
+      return snapshot.val();
+    })
+      .catch(err => {
+        return err;
       });
+    return recipes;
+  }
+
+  async getUsers() {
+    let users = await database.ref('users').once("value");
+    return users;
+  }
+
+  async signUpUser() {
+    if (!this.data) {
+      return false;
     }
-  */
+    let user = { ...this.data };
+    database.ref('users/' + this.data.uid)
+      .set({ email: user.user.email, username: user.user.username, recipes: user.user.recipes });
+    return uid;
+  }
+
+  async getUserByUID() {
+    let user = await database.ref(`users/${this.data.uid}`).once('value');
+    return user.val();
+  }
 }
 
 module.exports = {

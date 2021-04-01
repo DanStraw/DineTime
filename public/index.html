@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/flatly/bootstrap.min.css">
 
   <!-- Font Awesome CSS Icons (For cool glyphicons) -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <script src="https://kit.fontawesome.com/463c49a95b.js" crossorigin="anonymous"></script>
 
   <!-- Add a link to the Bootstrap -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -27,6 +27,9 @@
   <link href="https://cdn.rawgit.com/michalsnik/aos/2.1.1/dist/aos.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="https://developer.edamam.com/attribution/badge.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"></script>
 </head>
 <!--start of body-->
 
@@ -40,6 +43,7 @@
           <b id="headline">Recipes for Food &amp; Drinks!</b>
         </h1>
       </div>
+
     </div>
 
     <hr>
@@ -54,12 +58,12 @@
                   <strong>
                     <i class="fa  fa-list-alt"></i> Food Recipe</strong>
                 </h3>
-                <div id="food-select">
+                <!-- <div id="food-select">
                   Search By: <select name="dish-search-type" id="dish-type-select">
                     <option value="dish-name" selected>Recipe Name</option>
                     <option value="ingredients">Ingredients</option>
                   </select>
-                </div>
+                </div> -->
 
               </div>
               <div class="panel-body" id='food-recipe-search'>
@@ -125,16 +129,59 @@
       </div>
 
       <div class="col-md-3">
+        <aside class="panel panel-primary" id="login-panel">
+          <div class="panel-heading" id="login-panel-heading">
+            <h3 class="text-center" id="login-header-text">Login</h3>
+          </div>
+          <div id="login-body">
+            <form role="form" id="login-form" autocomplete="on">
+              <label for="login-email">Email</label>
+              <input type="text" class="form-control" id="login-email" name="loginEmail">
+              <label for="login-password">Password</label>
+              <input type="password" class="form-control" id="login-password" autocomplete="off">
+              <div class="text-center credential-form-buttons">
+                <button type="submit" class="align-center btn btn-default" id="login-button">
+                  <i class="fa fa-sign-in"></i> Log In
+                </button>
+                <div>or</div>
+                <button type="button" class="btn btn-outline-primary auth-toggle-button">Sign Up</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="signup-body">
+            <form role="form" autocomplete="on">
+              <label for="signup-email">Email</label>
+              <input type="text" class="form-control" id="signup-email">
+              <label for="signup-username">Username</label>
+              <input type="text" class="form-control" id="signup-username">
+              <label for="signup-password">Password</label>
+              <input type="password" class="form-control" id="signup-password" autocomplete="off">
+              <label for="signup-password-confirm">Confirm Password</label>
+              <input type="password" class="form-control" id="signup-password-confirm" autocomplete="off">
+              <div class="text-center credential-form-buttons">
+                <button type="submit" class="align-center btn btn-default" id="signup-button">
+                  <i class="fa fa-user-plus"></i> Sign Up
+                </button>
+                <div>or</div>
+                <button type="button" class="btn btn-outline-primary auth-toggle-button">Log In</button>
+              </div>
+            </form>
+          </div>
+
+        </aside>
         <aside class="panel panel-primary" id="history-panel">
-          <div class="panel-heading" id="history-panel-heading">
+          <div class="panel-heading d-flex justify-content-between" id="history-panel-heading">
             <h3>Search History</h3>
+            <i class="fas fa-sign-out-alt fa-2" id="logout-icon" data-trigger="hover" data-toggle="popover"
+              title="Log Out"></i>
           </div>
           <div id="dish-div" value="dish-history">
             <h4>Dishes</h4>
             <ul id="dish-history"></ul>
           </div>
-          <div>
-            <h4 id="drink-div" value="drink-history">Drinks</h4>
+          <div id="drink-div" value="drink-history">
+            <h4>Drinks</h4>
             <ul id="drink-history"></ul>
           </div>
         </aside>
@@ -174,8 +221,6 @@
   <!-- Add a link to the JQuery Library-->
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"
     integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <!-- add firebase link -->
-  <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
   <!-- Add a link to SweetAlert Library -->
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <!-- Add a link to the javascript file -->

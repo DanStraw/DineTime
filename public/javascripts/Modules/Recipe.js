@@ -1,8 +1,12 @@
 class Recipe {
-  constructor(term, data, index) {
+  constructor(term, data, index, type, searchHistoryIndex, userIsAuthorized) {
     this.term = term;
     this.data = data;
     this.index = index;
+    this.type = type;
+    this.searchHistoryIndex = searchHistoryIndex;
+    this.userIsAuthorized = userIsAuthorized;
+
   }
 
   addInfo(_type, _html_attr, _text) {
@@ -20,6 +24,7 @@ class Recipe {
     if (ingredientsLine) {
       if (typeof ingredientsLine === "object") {
         for (let ingredient in ingredientsLine) {
+
           list.append(`<li>${ingredientsLine[`${ingredient}`]}</li>`);
         }
       } else {
@@ -30,7 +35,10 @@ class Recipe {
       return list;
     } else if (ingredients) {
       for (let i = 0; i < ingredients.length; i++) {
-        list.append("<li>" + (measurements[i] || "") + " " + ingredients[i] || (ingredients[`${i}`]["text"] || "") + "</li>");
+        if (ingredients[i]) {
+          list.append("<li>" + (measurements[i] || "") + " " + ingredients[i] || (ingredients[`${i}`]["text"] || "") + "</li>");
+        }
+
       }
       return list;
     }
@@ -38,15 +46,13 @@ class Recipe {
   }
 
   display() {
-    const deleteVal = removeSpaces(this.term);
     let resultDiv = this.addInfo('<div>', { "class": 'resultItem col-md-5 offset-md-1' });
     const headerRow = this.addInfo('<div>', { "class": "row" }, null);
     var heading = this.addInfo("<h3>", { "id": "item-name", 'class': 'col-md-9' }, this.data.drinkName || this.data.strDrink || this.data.label || this.data.dishName);
-    const deleteButton = this.addInfo('<button>', { 'class': 'col-md-2 delete-item btn btn-outline-secondary', 'value': deleteVal + "-" + this.index, 'type': "button", 'data-trigger': "hover", 'data-toggle': 'popover', 'title': `Delete '${heading.text()}' recipe` }, 'X');
+    const deleteVal = removeSpaces(this.term);
+    const deleteButton = this.addInfo('<button>', { 'class': 'col-md-2 delete-item btn btn-outline-secondary', 'value': deleteVal + "-" + this.index, 'type': "button", 'data-trigger': "hover", 'data-toggle': 'popover', 'title': `Delete '${heading.text()}' recipe`, "id": `${this.type}-${this.searchHistoryIndex}-recipe-${this.index}-delete-button` }, 'X');
     var image = this.addInfo("<img>", { "src": this.data.picture || this.data.image || this.data.strDrinkThumb })
 
-
-    //set ingredient and measurements
     if (!this.data.ingredients && !this.data.ingredientLines) {
       this.data.ingredients = [];
       this.data.measurements = [];
@@ -67,7 +73,8 @@ class Recipe {
     const instruction_attributes = this.data.strInstructions ? { "id": "instructions" } : { "id": "instructions", "href": (this.data.recipe || this.data.url), "title": this.data.dishName + " Recipe" };
     var instructions = this.addInfo((this.data.strInstructions ? "<p>" : "<a>"), instruction_attributes, (!this.data.strInstructions ? "Link to Recipe" : this.data.strInstructions));
 
-    headerRow.append(heading).append(deleteButton);
+
+    this.userIsAuthorized ? headerRow.append(heading).append(deleteButton) : headerRow.append(heading);
     resultDiv.append(headerRow);
     resultDiv.append(image);
     resultDiv.append(recipe);

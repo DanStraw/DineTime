@@ -1,83 +1,132 @@
 var express = require('express');
 var router = express.Router();
+const { DrinkSearch } = require("../models/DrinkSearch");
+const { DishSearch } = require("../models/DishSearch");
 let fbService = require('../services/FirebaseService');
 let FBSrvice = fbService.FirebaseService;
+var admin = require("../services/fbAdmin");
 
+router.post('/:type/:searchTerm', async function (req, res, next) {
+  let cookie = req.cookies["session"] || null;
+  let recipeSearch = req.params.type === 'food' ? new DishSearch(req.params.searchTerm, "food") : new DrinkSearch(req.params.searchTerm, "drink");
+  let result = await recipeSearch.searchAPI();
+  if (result.statusCode === 404) {
+    return res.status(404).send(recipeSearch);
+  }
+
+  if (cookie) {
+    admin.auth().verifyIdToken(cookie).then(async (decodedToken) => {
+      const uid = decodedToken.uid;
+      let _fbService = new FBSrvice({
+        searchTerm: recipeSearch.searchTerm,
+        type: recipeSearch.type,
+        results: recipeSearch.results,
+        uid: uid
+      });
+      let userSearchHistoryIndex = 0;
+      let user = await _fbService.getUserByUID();
+      let searchList = user.recipes[`${recipeSearch.type}`];
+      for (let search in searchList) {
+        if (parseInt(search) !== userSearchHistoryIndex) {
+          break;
+        }
+        userSearchHistoryIndex++;
+      }
+      await _fbService.saveResults();
+      res.send({
+        searchTerm: recipeSearch.searchTerm,
+        type: recipeSearch.type,
+        results: recipeSearch.results,
+        index: userSearchHistoryIndex
+      });
+    })
+      .catch(err => {
+        return res.send({
+          searchTerm: recipeSearch.searchTerm,
+          type: recipeSearch.type,
+          results: recipeSearch.results
+        });
+      })
+  } else {
+    return res.send({
+      searchTerm: recipeSearch.searchTerm,
+      type: recipeSearch.type,
+      results: recipeSearch.results
+    });
+  }
+});
+
+router.get('/', async (req, res) => {
+  const idToken = req.cookies.session || "";
+
+  admin.auth().verifyIdToken(idToken, true)
+    .then(async (cred) => {
+      let _fbService = new FBSrvice({ idToken: cred.uid });
+      let data = await _fbService.getSearchHistory();
+      let drink = data.drink.map((element, index) => {
+        if (element !== null) {
+          return {
+            searchTerm: element.searchTerm,
+            index
+          }
+        }
+      });
+      let food = data.food.map((element, index) => {
+        if (element !== null) {
+          return {
+            searchTerm: element.searchTerm,
+            index
+          }
+        }
+      });
+      res.send({ food, drink });
+    })
+    .catch(err => {
+      res.status(403).send("Unauthorized");
+    })
+
+});
 
 router.get('/:searchTerm', async function (req, res, next) {
   let _fbService = new FBSrvice({
-    searchKey: req.params.searchTerm
+    searchTerm: req.params.searchTerm
   });
   let data = await _fbService.getRecipes();
-  res.send(data.val());
-});
-
-router.get('/:recipeType/:searchTerm', async function (req, res, next) {
-  let _fbService = new FBSrvice({ searchKey: req.params.searchTerm });
-  let data = await _fbService.getRecipes();
-  res.send(data.val());
-})
-
-router.get('/removeChild', function (req, res, next) {
-  return fbService.childRemovedListener();
-});
-
-router.get('/', async function (req, res, next) {
-  let _fbService = new FBSrvice(null);
-  let data = await _fbService.getSearchHistory();
-  res.send(data.val());
-});
-
-router.post('/dish/:term', async function (req, res, next) {
-  let _fbService = new FBSrvice({
-    term: req.body.searchTerm,
-    type: 'food'
-  });
-  let data = await _fbService.searchDish();
-  console.log('sending data dishing: ' + data);
   res.send(data);
 });
 
-router.post('/drink/:term', async function (req, res, next) {
-  let _fbService = new FBSrvice({
-    term: req.params.term,
-    type: 'drink'
-  });
-  const data = await _fbService.searchDrink()
-    .then(function (response) {
-      let responseData = _fbService.saveResults();
-      return responseData;
-    });
-  res.send(data);
+router.get('/:type/:searchTerm', async function (req, res, next) {
+  let cookie = req.cookies["session"] || null;
+  if (cookie) {
+    admin.auth().verifyIdToken(cookie)
+      .then(async (decodedToken) => {
+        const uid = decodedToken.uid;
+        let { type, searchTerm } = req.params;
+        type = type.split("-")[0];
+        let _fbService = new FBSrvice({ type, searchTerm, uid });
+        let data = await _fbService.getRecipes();
+        if (data === null) {
+          return res.status(404).send('Data not found');
+        }
+        const user = await _fbService.getUserByUID();
+        let resultsIndexes = [];
+        user.recipes[`${type}`].forEach(element => {
+          if (element.searchTerm === searchTerm) {
+            resultsIndexes = element.resultsIndexes;
+            data.results = data.results.filter((result, index) => {
 
-})
-
-router.delete('/:searchTerm', async function (req, res, next) {
-
-  let _fbService = new FBSrvice({
-    term: req.params.searchTerm,
-  });
-  await _fbService.deleteSearch().then(function (response) {
-    res.send(response);
-  }).catch(function (err) {
-    res.send(err);
-  })
-})
-
-router.delete('/:searchTerm/:index', async function (req, res, next) {
-  console.log('router delete single recipe');
-  let _fbService = new FBSrvice({
-    key: req.params.searchTerm,
-    index: req.params.index,
-    results: [],
-    type: null
-  });
-
-  await _fbService.deleteRecipe().then(function (response) {
-    res.send(response);
-  }).catch(function (err) {
-    res.send(err);
-  });
-})
+              return resultsIndexes.includes(index);
+            })
+          }
+        });
+        res.json({ data, resultsIndexes });
+      })
+      .catch(err => {
+        res.status(403).send({ message: 'Unauthorized', err });
+      })
+  } else {
+    res.status(403).send({ message: 'Unauthorized' });
+  }
+});
 
 module.exports = router;

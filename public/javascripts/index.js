@@ -2,6 +2,19 @@ $("#food-drink-view").hide();
 $("#drink-history").hide();
 $("#dish-history").hide();
 $("#food-ingredients-search").hide();
+$('#signup-body').hide();
+$('#history-panel').hide();
+
+var config = {
+    apiKey: "AIzaSyDFxvI2pF2TVAL8YxlTKiIJsA3zAT8wT1I",
+    authDomain: "dinetime-c2874.firebaseapp.com",
+    databaseURL: "https://dinetime-c2874.firebaseio.com",
+    projectId: "dinetime-c2874",
+    storageBucket: "",
+    messagingSenderId: "647476940046"
+};
+let fb_app;
+
 
 const ingredientSearch = new Search(null, 'ingredient');
 
@@ -20,6 +33,111 @@ const clearSearchHisory = function () {
     $("#drink-history").empty();
 }
 
+
+const signupUser = function (event) {
+    event.preventDefault();
+    fb_app = firebase.initializeApp(config);
+    fb_app.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+    const userInfo = {
+        username: $("#signup-username").val().trim(),
+        email: $("#signup-email").val().trim(),
+        password: $("#signup-password").val().trim(),
+        passwordConfirm: $("#signup-password-confirm").val().trim()
+    }
+
+
+    fb_app.auth().createUserWithEmailAndPassword(userInfo.email, userInfo.password).then(({ user }) => {
+        return user.getIdToken().then((idToken) => {
+            userInfo.idToken = idToken;
+            return $.ajax({
+                url: `/users`,
+                dataType: 'JSON',
+                method: 'POST',
+                data: userInfo
+            })
+        })
+    }).then(response => {
+        fb_app.delete();
+        clearUserLogin();
+        clearUserSignup();
+        displayLoggedInState();
+        getSearchHistory()
+    }).catch(err => {
+        fb_app.delete();
+    })
+}
+
+const loginUser = function (event) {
+    event.preventDefault();
+    fb_app = firebase.initializeApp(config);
+    fb_app.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+    const email = $("#login-email").val();
+    const password = $("#login-password").val();
+    fb_app.auth().signInWithEmailAndPassword(email, password)
+        .then(({ user }) => {
+            user.getIdToken().then((idToken) => {
+                $.ajax({
+                    url: '/users/login',
+                    dataType: 'JSON',
+                    method: 'POST',
+                    data: { idToken }
+                }).then(response => {
+                    fb_app.delete();
+                    clearUserLogin();
+                    clearUserSignup();
+                    displayLoggedInState();
+                    getSearchHistory();
+                }).catch(err => {
+                    return swal('Email or Password Incorrect');
+                })
+            })
+        })
+        .catch((error) => {
+            fb_app.delete();
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            swal("Login Failed.  Please check your username and password and try again");
+        });
+}
+
+function logoutUser(event) {
+    event.preventDefault();
+    fb_app = !firebase.apps.length ? firebase.initializeApp(config) : firebase.apps[0];
+    fb_app.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+    fb_app.auth().signOut().then(() => {
+        $.getJSON(`/users/auth/logout`).then(() => {
+            displayLoggedOutState();
+            fb_app.delete();
+        }).catch(err => {
+            return err;
+        })
+    }).catch((error) => {
+        console.log('auth logout error: ' + error);
+    })
+}
+
+const toggleAuthForm = function () {
+    if ($('#login-body').is(":hidden")) {
+        $('#login-body').show();
+        $('#signup-body').hide();
+        $("#login-header-text").text("Login");
+    } else {
+        $('#login-body').hide();
+        $('#signup-body').show();
+        $("#login-header-text").text("Sign Up");
+    }
+}
+
+const displayLoggedInState = function () {
+    $("#history-panel").show();
+    $("#login-panel").hide();
+}
+
+const displayLoggedOutState = function () {
+    $("#history-panel").hide();
+    $("#login-panel").show();
+}
+
 const types = ['food', 'drink'];
 types.forEach(type => {
     $(`#search-${type}`).on("click", function (event) {
@@ -35,32 +153,43 @@ types.forEach(type => {
     })
 });
 
-function searchRecipes(term, type) {
+async function searchRecipes(term, type) {
     resetResultsView();
     let search = new Search(term, type);
-    if (search.findItem()) {
-        return swal(`${term} is already in search history`)
-    };
-    let recipes;
-    if (type === 'food') {
-        search.dish().then(data => {
-            recipes = data;
-            const recipesToDisplay = new HistoryItem(recipes.searchTerm, removeSpaces(recipes.searchTerm), recipes.type, recipes.results);
-            recipesToDisplay.display();
-            recipesToDisplay.showRecipes();
-        });
-    } else {
-        search.drink().then(data => {
-            const results = data["results"];
-            const type = data["type"];
-            const searchTerm = data["searchTerm"]
-            const recipesToDisplay = new HistoryItem(searchTerm, removeSpaces(searchTerm), type, results);
-            recipesToDisplay.display();
-            recipesToDisplay.showRecipes();
-        });
+    const userMatch = await search.userHistory();
+    if (userMatch.match) {
+        return swal(`${type} search of ${term} is already in your history`);
     }
+    const recipeCollectionMatch = await search.recipeHistory();
+    if (recipeCollectionMatch.isMatch) {
+        search.addToUserHistory(recipeCollectionMatch.recipes.data.results.length).then(async (response) => {
+            const { index } = response;
+            let { recipes } = recipeCollectionMatch;
+            const recipesToDisplay = new HistoryItem({ searchTerm: recipes.searchTerm, index }, removeSpaces(recipes.searchTerm), recipes.type, recipes.results, true);
+            recipesToDisplay.display();
+            recipesToDisplay.showRecipes();
+        });
 
-
+    } else {
+        await search.newRecipe(type).then(data => {
+            search.addToUserHistory(data.results.length)
+                .then(() => {
+                    let resultsIndexes = [];
+                    for (let i = 0; i < data.results.length; i++) {
+                        resultsIndexes.push(i);
+                    }
+                    const recipesToDisplay = new HistoryItem({ searchTerm: data.searchTerm, index: data.index }, removeSpaces(data.searchTerm), data.type, data.results, resultsIndexes, true);
+                    recipesToDisplay.display();
+                    recipesToDisplay.showRecipes();
+                })
+                .catch(err => {
+                    const recipesToDisplay = new HistoryItem(data.searchTerm, removeSpaces(data.searchTerm), data.type, data.results);
+                    recipesToDisplay.display();
+                    recipesToDisplay.showRecipes();
+                })
+        })
+            .catch(() => swal("No recipes found")); 14
+    }
 }
 
 const toggleHistoryList = function (id) {
@@ -83,10 +212,15 @@ $("#add-ingredient").on('click', function (event) {
     $('#ingredient-input').empty();
 })
 
-function deleteItemFromSearchHistory() {
+function deleteItemFromSearchHistory(event) {
+    event.preventDefault();
     var searchTerm = $(this).val().trim();
+    let typeIndex = $(`#${searchTerm}-hist`).attr("value");
+    typeIndex = typeIndex.split("-");
+    var type = typeIndex[0];
+    const index = typeIndex[1];
     $.ajax({
-        url: `/recipes/${removeSpaces(searchTerm)}`,
+        url: `/users/auth/recipes/${type}/${index}`,
         type: 'DELETE',
         dataType: 'JSON'
     }).then(function (response) {
@@ -97,52 +231,87 @@ function deleteItemFromSearchHistory() {
     })
 }
 
+function clearUserLogin() {
+    $('#login-email:text').val("");
+    $('input[type="password"]').val('');
+}
+function clearUserSignup() {
+    $("#signup-email:text").val("");
+    $("#signup-username:text").val("");
+    $('input[type="password"]').val('');
+}
+
 function deleteSingleRecipe() {
-    var [searchTerm, index] = $(this).val().trim().split("-");
-    console.log(searchTerm, index);
+    var [searchTerm] = $(this).val().trim().split("-");
+    const idString = $(this).attr('id').split("-");
+    const type = idString[0];
+    const searchHistoryIndex = idString[1];
+    const recipeResultsIndex = idString[3];
     $.ajax({
-        url: `/recipes/${searchTerm}/${index}`,
+        url: `users/auth/recipes/${type}/${searchHistoryIndex}/${recipeResultsIndex}`,
         type: 'DELETE',
         dataType: 'JSON'
     }).then(function (response) {
-        console.log('delete singl rec res: ' + response)
         if (response.statusCode === 202) {
-            resetRecipesView(searchTerm);
+            resetRecipesView(searchTerm, type, searchHistoryIndex);
         }
+    }).catch(err => {
+        console.log('delete error: ', err);
     })
 }
 
 function showHistoryItemRecipes() {
     resetResultsView();
     var searchTerm = $(this).text().trim();
-    $.getJSON(`/recipes/${removeSpaces(searchTerm)}`, function (data) {
-        const historyItem = new HistoryItem(data.searchTerm, removeSpaces(data.searchTerm), data.type, data.results);
+    const type = $(this).attr('value');
+    const searchHistoryIndex = type.split("-")[1];
+    $.getJSON(`/recipes/${type}/${removeSpaces(searchTerm)}`, function (response) {
+        response.resultsIndexes = response.resultsIndexes.filter(element => {
+            return element !== null
+        })
+        const historyItem = new HistoryItem({ searchTerm: response.data.searchTerm, index: searchHistoryIndex }, removeSpaces(response.data.searchTerm), response.data.type, response.data.results, response.resultsIndexes, true);
         historyItem.showRecipes();
     })
 }
 
-function resetRecipesView(searchTerm) {
-    $.getJSON(`/recipes/${removeSpaces(searchTerm)}`, function (data) {
-        const historyItem = new HistoryItem(data.searchTerm, removeSpaces(data.searchTerm), data.type, data.results);
+function resetRecipesView(searchTerm, type, searchHistoryIndex) {
+    $('#food-drink-view').empty();
+    $.getJSON(`/recipes/${type}/${removeSpaces(searchTerm)}`, function (response) {
+        response.resultsIndexes = response.resultsIndexes.filter(element => {
+            return element !== null
+        });
+        const historyItem = new HistoryItem({ searchTerm: response.data.searchTerm, index: searchHistoryIndex }, removeSpaces(response.data.searchTerm), response.data.type, response.data.results, response.resultIndexes, true);
         historyItem.showRecipes();
     })
 }
 
 function getSearchHistory() {
     $.getJSON('/recipes', function (data) {
-        for (let item in data) {
-            let itemData = data[item];
-            let historyItem = new HistoryItem(itemData.searchTerm, removeSpaces(itemData.searchTerm), itemData.type, itemData.results);
+        displayLoggedInState();
+        let { food, drink } = data;
+        for (let item in food) {
+            let itemData = food[item];
+            if (itemData === null) continue;
+            let historyItem = new HistoryItem(itemData, removeSpaces(itemData.searchTerm), "food");
+            historyItem.display();
+        }
+        for (let item in drink) {
+            let itemData = drink[item];
+            if (itemData === null) continue;
+            let historyItem = new HistoryItem(itemData, removeSpaces(itemData.searchTerm), "drink");
             historyItem.display();
         }
     })
 }
 
-
 $(document).ready(getSearchHistory);
 $(document).on("click", ".history", showHistoryItemRecipes);
 $(document).on("click", ".delete", deleteItemFromSearchHistory);
 $(document).on("click", ".delete-item", deleteSingleRecipe);
+$(document).on('click', ".auth-toggle-button", toggleAuthForm);
+$(document).on('click', "#signup-button", signupUser);
+$(document).on('click', "#login-button", loginUser);
+$(document).on('click', '#logout-icon', logoutUser);
 
 $('#dish-type-select').change(function () {
     switch ($(this).val()) {
