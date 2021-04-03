@@ -6,7 +6,7 @@ dotenv.config({
   path: path.resolve(__dirname, '../config/.env')
 });
 
-var serviceAccount = require('../serviceAccountKey.json') || process.env.SERVICE_ACCOUNT_KEY;
+var serviceAccount = process.env.SERVICE_ACCOUNT_KEY || require('../serviceAccountKey.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
