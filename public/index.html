@@ -58,12 +58,12 @@
                   <strong>
                     <i class="fa  fa-list-alt"></i> Food Recipe</strong>
                 </h3>
-                <!-- <div id="food-select">
+                <div id="food-select">
                   Search By: <select name="dish-search-type" id="dish-type-select">
                     <option value="dish-name" selected>Recipe Name</option>
                     <option value="ingredients">Ingredients</option>
                   </select>
-                </div> -->
+                </div>
 
               </div>
               <div class="panel-body" id='food-recipe-search'>
@@ -77,12 +77,14 @@
               </div>
               <div class="panel-body" id="food-ingredients-search">
                 <form role="form">
-                  <label for="ingredient-input">Add Ingredients</label>
-                  <input type="text" class="form-control" id="ingredient-input">
+                  <label for="ingredient-input">Ingredient Name</label>
+                  <div class="wrap">
+                    <input type="text" class="form-control" id="ingredients-input">
+                    <button type="button" class="btn btn-default" id="add-ingredient">Add Ingredient</button>
+                  </div>
+
                   <div id="ingredients-list"></div>
-                  <button type="submit" class="btn btn-default" id="add-ingredient">Add
-                    Ingredient</button>
-                  <button type="submit" class="btn btn-default" id="ingredients-search">Search with
+                  <button type="submit" class="btn btn-default" id="search-ingredients">Search with
                     these Ingredients</button>
                 </form>
               </div>
@@ -177,12 +179,17 @@
               title="Log Out"></i>
           </div>
           <div id="dish-div" value="dish-history">
-            <h4>Dishes</h4>
+            <h4>Dishes<span class="toggle-symbol">+</span></h4>
             <ul id="dish-history"></ul>
           </div>
           <div id="drink-div" value="drink-history">
-            <h4>Drinks</h4>
+            <h4>Drinks<span class="toggle-symbol">+</span></h4>
             <ul id="drink-history"></ul>
+          </div>
+
+          <div id="ingredients-div" value="ingredients-history">
+            <h4>Ingredients <span class="toggle-symbol">+</span></h4>
+            <ul id="ingredients-history"></ul>
           </div>
         </aside>
 

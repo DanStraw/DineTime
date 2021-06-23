@@ -8,22 +8,40 @@ class HistoryItem {
     this.userIsAuthroized = userIsAuthroized;
   }
 
-  display() {
+  display(ingredientSearchCount = 0) {
     var searchTermDiv = $('<div>');
-    searchTermDiv.append(this.itemData.searchTerm || this.itmeData);
+    let historyText = "";
+    if (this.type === "ingredients") {
+      let ing_string = "";
+      for (const term in this.itemData.searchTerm) {
+        if (ing_string === "") {
+          ing_string += this.itemData.searchTerm[term];
+        } else {
+          ing_string += `, ${this.itemData.searchTerm[term]}`;
+        }
+
+      }
+      historyText = "Ingredient Search " + ingredientSearchCount;
+      searchTermDiv.attr({ "data-toggle": "popover", "data-trigger": "focus", "title": ing_string });
+    } else {
+      historyText = this.itemData.searchTerm
+    }
+    searchTermDiv.append(historyText);
     searchTermDiv.addClass('history');
-    searchTermDiv.attr({ "id": this.id + "-hist", "value": this.type + "-" + this.itemData.index })
+    searchTermDiv.attr({ "id": this.type + "__" + this.id + "__hist" });
     var histItem = $("<li>");
     histItem.attr("id", this.id + "histdiv");
     histItem.append(searchTermDiv);
     var deleteButton = $("<button>")
     deleteButton.addClass("delete");
-    deleteButton.attr("value", this.itemData.searchTerm || this.itemData);
+    deleteButton.attr("value", this.type + "_" + this.id);
     deleteButton.append("x");
     histItem.append(deleteButton);
 
     if (this.type === 'drink') {
       $("#drink-history").append(histItem);
+    } else if (this.type === "ingredients") {
+      $("#ingredients-history").append(histItem);
     } else {
       $("#dish-history").append(histItem);
     }
@@ -36,6 +54,7 @@ class HistoryItem {
     if (typeof this.results === "object") {
       for (let result in this.results) {
         if (this.results[result] !== null) {
+
           const recipe = new Recipe(this.itemData.searchTerm || this.itemData, this.results[result], this.resultIndexes[result], this.type, this.itemData.index, this.userIsAuthroized);
           resultsView.append(recipe.display());
           $("#food-drink-view").prepend(resultsView);

@@ -2,14 +2,31 @@ var express = require('express');
 var router = express.Router();
 const { DrinkSearch } = require("../models/DrinkSearch");
 const { DishSearch } = require("../models/DishSearch");
+const { IngredientsSearch } = require('../models/IngredientsSearch');
 let fbService = require('../services/FirebaseService');
 let FBSrvice = fbService.FirebaseService;
 var admin = require("../services/fbAdmin");
 
-router.post('/:type/:searchTerm', async function (req, res, next) {
+router.post('/:type', async function (req, res, next) {
   let cookie = req.cookies["session"] || null;
-  let recipeSearch = req.params.type === 'food' ? new DishSearch(req.params.searchTerm, "food") : new DrinkSearch(req.params.searchTerm, "drink");
-  let result = await recipeSearch.searchAPI();
+  let recipeSearch = req.params.type === 'food' ? new DishSearch(req.body["term[]"] || req.body.term, "food") : req.params.type === 'drink' ? new DrinkSearch(req.body["term[]"] || req.body.term, "drink") : new IngredientsSearch(req.body["term"], "ingredients");
+  let result;
+  if (recipeSearch.type === 'ingredients') {
+
+    while (recipeSearch.results.length < 10 && recipeSearch.resultsLengthChanged === true || recipeSearch.startIndex <= 20) {
+      console.log('current res less than 10: ' + recipeSearch.results.length < 10);
+      console.log('start index: ' + recipeSearch.startIndex);
+      await recipeSearch.searchIngredients();
+      recipeSearch.filterIngredients();
+      recipeSearch.filterResultsByMatchPerc();
+      recipeSearch.sortResultsByMatchPerc();
+      recipeSearch.filterTopTenResults();
+      recipeSearch.updateStartIndex();
+      result = recipeSearch.returnResults();
+    }
+  } else {
+    result = await recipeSearch.searchAPI();
+  }
   if (result.statusCode === 404) {
     return res.status(404).send(recipeSearch);
   }
@@ -23,28 +40,20 @@ router.post('/:type/:searchTerm', async function (req, res, next) {
         results: recipeSearch.results,
         uid: uid
       });
-      let userSearchHistoryIndex = 0;
-      let user = await _fbService.getUserByUID();
-      let searchList = user.recipes[`${recipeSearch.type}`];
-      for (let search in searchList) {
-        if (parseInt(search) !== userSearchHistoryIndex) {
-          break;
-        }
-        userSearchHistoryIndex++;
-      }
-      await _fbService.saveResults();
+      const key = await _fbService.saveResults();
       res.send({
         searchTerm: recipeSearch.searchTerm,
         type: recipeSearch.type,
         results: recipeSearch.results,
-        index: userSearchHistoryIndex
+        key: key
       });
     })
       .catch(err => {
         return res.send({
           searchTerm: recipeSearch.searchTerm,
           type: recipeSearch.type,
-          results: recipeSearch.results
+          results: recipeSearch.results,
+          key: 0
         });
       })
   } else {
@@ -63,23 +72,7 @@ router.get('/', async (req, res) => {
     .then(async (cred) => {
       let _fbService = new FBSrvice({ idToken: cred.uid });
       let data = await _fbService.getSearchHistory();
-      let drink = data.drink.map((element, index) => {
-        if (element !== null) {
-          return {
-            searchTerm: element.searchTerm,
-            index
-          }
-        }
-      });
-      let food = data.food.map((element, index) => {
-        if (element !== null) {
-          return {
-            searchTerm: element.searchTerm,
-            index
-          }
-        }
-      });
-      res.send({ food, drink });
+      res.send({ data });
     })
     .catch(err => {
       res.status(403).send("Unauthorized");
@@ -95,30 +88,27 @@ router.get('/:searchTerm', async function (req, res, next) {
   res.send(data);
 });
 
-router.get('/:type/:searchTerm', async function (req, res, next) {
+router.get('/:type/:dbKey', async function (req, res, next) {
   let cookie = req.cookies["session"] || null;
   if (cookie) {
     admin.auth().verifyIdToken(cookie)
       .then(async (decodedToken) => {
         const uid = decodedToken.uid;
-        let { type, searchTerm } = req.params;
+        let { type, dbKey } = req.params;
+
         type = type.split("-")[0];
-        let _fbService = new FBSrvice({ type, searchTerm, uid });
+        let _fbService = new FBSrvice({ type, dbKey, uid });
         let data = await _fbService.getRecipes();
         if (data === null) {
           return res.status(404).send('Data not found');
         }
         const user = await _fbService.getUserByUID();
-        let resultsIndexes = [];
-        user.recipes[`${type}`].forEach(element => {
-          if (element.searchTerm === searchTerm) {
-            resultsIndexes = element.resultsIndexes;
-            data.results = data.results.filter((result, index) => {
+        let resultsIndexes = user.recipes[`${type}`][`${dbKey}`]['resultsIndexes'];;
 
-              return resultsIndexes.includes(index);
-            })
-          }
-        });
+        data.results = data.results.filter((result, index) => {
+          return resultsIndexes.includes(index);
+        })
+
         res.json({ data, resultsIndexes });
       })
       .catch(err => {
@@ -126,6 +116,27 @@ router.get('/:type/:searchTerm', async function (req, res, next) {
       })
   } else {
     res.status(403).send({ message: 'Unauthorized' });
+  }
+});
+
+router.get('/:type/term/:term', async function (req, res, next) {
+  let cookie = req.cookies["session"] || null;
+  if (cookie) {
+    admin.auth().verifyIdToken(cookie)
+      .then(async (decodedToken) => {
+        const uid = decodedToken.uid;
+        let { type, term } = req.params;
+
+        const _fbService = new FBSrvice({ type });
+        const searches = await _fbService.getSearchesByType();
+        console.log(searches);
+        for (const search in searches) {
+          if (search.searchTerm === term) {
+            return res.json({ search, match: true })
+          }
+        }
+        return res.json({ search: null, match: false });
+      });
   }
 });
 

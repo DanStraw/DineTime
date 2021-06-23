@@ -25,14 +25,14 @@ class Search {
   }
 
   removeIngredient(index) {
-    this.ingredients.splice(1, index);
+    this.ingredients.splice(index, 1);
   }
 
   getTerm() {
     return this.term;
   }
 
-  async addToUserHistory(recipeResultsLength) {
+  async addToUserHistory(recipeResultsLength, key) {
     return await $.ajax({
       url: '/users/searchHistory',
       dataType: 'JSON',
@@ -40,7 +40,8 @@ class Search {
       data: {
         type: this.type,
         searchTerm: this.term,
-        resultsLength: recipeResultsLength
+        resultsLength: recipeResultsLength,
+        key
       }
     })
       .then(response => {
@@ -57,6 +58,7 @@ class Search {
       dataType: 'JSON',
       method: 'GET'
     }).then(response => {
+      console.log('search response: ' + JSON.stringify(response));
       return response;
     }).catch(err => {
       return { match: err.match, message: err.message };
@@ -64,15 +66,25 @@ class Search {
     return await searchTermIsInUserHistory;
   }
 
+  arrayToString(terms) {
+    let termsString = "";
+    for (let term of terms) {
+      termsString += term + ",";
+    }
+    return termsString;
+  }
+
   async recipeHistory() {
+    let termString = this.type === "ingredients" ? this.arrayToString(this.term) : this.term;
     const searchInRcipeCollection = await $.ajax({
-      url: `/recipes/${this.type}/${removeSpaces(this.term)}`,
+      url: `/recipes/${this.type}/term/${removeSpaces(termString)}`,
       dataType: 'JSON',
       method: 'GET'
     }).then((response) => {
+      console.log("dbResponse", response);
       const responseObj = {
-        isMatch: true,
-        recipes: response
+        isMatch: response.match,
+        recipes: response.search
       };
       return responseObj;
     }).catch((err) => {
@@ -85,10 +97,16 @@ class Search {
   }
 
   async newRecipe(type) {
+    console.log('new recip' + type);
+    let term = this.term;
+    if (type == "food" || type == "drink") {
+      term = removeSpaces(term);
+    }
     const result = await $.ajax({
-      url: `/recipes/${type}/${removeSpaces(this.term)}`,
+      url: `/recipes/${type}`,
       type: 'POST',
-      dataType: 'JSON'
+      dataType: 'JSON',
+      data: { "term": this.term }
     }).done(function (response) {
       if (response) {
         return response;

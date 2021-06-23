@@ -31,6 +31,7 @@ const resetResultsView = function () {
 const clearSearchHisory = function () {
     $("#dish-history").empty();
     $("#drink-history").empty();
+    $("#ingredients-history").empty();
 }
 
 
@@ -138,11 +139,11 @@ const displayLoggedOutState = function () {
     $("#login-panel").show();
 }
 
-const types = ['food', 'drink'];
+const types = ['food', 'drink', 'ingredients'];
 types.forEach(type => {
     $(`#search-${type}`).on("click", function (event) {
         event.preventDefault();
-        var term = $(`#${type}-input`).val().trim();
+        var term = type === "ingredients" ? ingredientSearch.ingredients : $(`#${type}-input`).val().trim();
         if (term === "") {
             clearInputFields();
             return swal("You left the search box empty");
@@ -158,6 +159,7 @@ async function searchRecipes(term, type) {
     let search = new Search(term, type);
     const userMatch = await search.userHistory();
     if (userMatch.match) {
+        console.log('userMatch true');
         return swal(`${type} search of ${term} is already in your history`);
     }
     const recipeCollectionMatch = await search.recipeHistory();
@@ -172,55 +174,75 @@ async function searchRecipes(term, type) {
 
     } else {
         await search.newRecipe(type).then(data => {
-            search.addToUserHistory(data.results.length)
+            search.addToUserHistory(data.results.length, data.key)
                 .then(() => {
                     let resultsIndexes = [];
                     for (let i = 0; i < data.results.length; i++) {
                         resultsIndexes.push(i);
                     }
-                    const recipesToDisplay = new HistoryItem({ searchTerm: data.searchTerm, index: data.index }, removeSpaces(data.searchTerm), data.type, data.results, resultsIndexes, true);
-                    recipesToDisplay.display();
-                    recipesToDisplay.showRecipes();
+                    if (type === "ingredients") {
+                        const recipesToDisplay = new HistoryItem({ searchTerm: data.searchTerm, index: data.key }, data.key, data.type, data.results, resultsIndexes, true);
+                        recipesToDisplay.display($("#ingredients-history").children().length + 1);
+                        recipesToDisplay.showRecipes();
+                    } else {
+                        const recipesToDisplay = new HistoryItem({ searchTerm: data.searchTerm, index: data.key }, data.key, data.type, data.results, resultsIndexes, true);
+                        recipesToDisplay.display();
+                        recipesToDisplay.showRecipes();
+                    }
+
                 })
                 .catch(err => {
-                    const recipesToDisplay = new HistoryItem(data.searchTerm, removeSpaces(data.searchTerm), data.type, data.results);
-                    recipesToDisplay.display();
-                    recipesToDisplay.showRecipes();
+                    console.log('add to user hist err: ' + JSON.stringify(err));
                 })
         })
             .catch(() => swal("No recipes found")); 14
     }
 }
 
-const toggleHistoryList = function (id) {
+const toggleHistoryList = function (id, parent) {
     $(id).is(":visible") ? $(id).hide() : $(id).show();
+
+    $(id).is(":visible") ? parent.children("h4").children("span").text("-") : parent.children("h4").children("span").text("+");
 }
 
 $("#dish-div").on("click", function () {
-    toggleHistoryList(`#${$('#dish-div').attr("value")}`);
+    toggleHistoryList(`#${$('#dish-div').attr("value")}`, $('#dish-div'));
 })
 $("#drink-div").on("click", function () {
-    toggleHistoryList(`#${$('#drink-div').attr("value")}`);
+    toggleHistoryList(`#${$('#drink-div').attr("value")}`, $('#drink-div'));
+});
+
+$("#ingredients-div").on("click", function () {
+    toggleHistoryList(`#${$('#ingredients-div').attr("value")}`, $('#ingredients-div'));
 });
 
 $("#add-ingredient").on('click', function (event) {
     event.preventDefault();
-    let ingredient = $('#ingredient-input');
+    let ingredient = $('#ingredients-input');
     ingredientSearch.addIngredient(ingredient[0].value);
     let ingredientsView = new IngredientsView(ingredientSearch.ingredients);
     ingredientsView.showIngredients();
-    $('#ingredient-input').empty();
-})
+    $('#ingredients-input').val("");
+    $('#ingredients-input').focus();
+});
+
+function removeTermFromIngredientSearchList(event) {
+    event.preventDefault();
+    const index = $(this).attr("id");
+    ingredientSearch.removeIngredient(index);
+    let ingredientsView = new IngredientsView(ingredientSearch.ingredients);
+    ingredientsView.showIngredients();
+    $('#ingredients-input').val("");
+}
 
 function deleteItemFromSearchHistory(event) {
     event.preventDefault();
     var searchTerm = $(this).val().trim();
-    let typeIndex = $(`#${searchTerm}-hist`).attr("value");
-    typeIndex = typeIndex.split("-");
-    var type = typeIndex[0];
-    const index = typeIndex[1];
+    const values = searchTerm.split("__");
+    const type = values[0];
+    const key = values[1];
     $.ajax({
-        url: `/users/auth/recipes/${type}/${index}`,
+        url: `/users/auth/recipes/${type}/${key}`,
         type: 'DELETE',
         dataType: 'JSON'
     }).then(function (response) {
@@ -243,17 +265,17 @@ function clearUserSignup() {
 
 function deleteSingleRecipe() {
     var [searchTerm] = $(this).val().trim().split("-");
-    const idString = $(this).attr('id').split("-");
+    const idString = $(this).attr('id').split("__");
     const type = idString[0];
-    const searchHistoryIndex = idString[1];
+    const dbKey = idString[1];
     const recipeResultsIndex = idString[3];
     $.ajax({
-        url: `users/auth/recipes/${type}/${searchHistoryIndex}/${recipeResultsIndex}`,
+        url: `users/auth/recipes/${type}/${dbKey}/${recipeResultsIndex}`,
         type: 'DELETE',
         dataType: 'JSON'
     }).then(function (response) {
         if (response.statusCode === 202) {
-            resetRecipesView(searchTerm, type, searchHistoryIndex);
+            resetRecipesView(type, dbKey);
         }
     }).catch(err => {
         console.log('delete error: ', err);
@@ -262,25 +284,23 @@ function deleteSingleRecipe() {
 
 function showHistoryItemRecipes() {
     resetResultsView();
-    var searchTerm = $(this).text().trim();
-    const type = $(this).attr('value');
-    const searchHistoryIndex = type.split("-")[1];
-    $.getJSON(`/recipes/${type}/${removeSpaces(searchTerm)}`, function (response) {
+    let params = $(this).attr("id").split("__");
+    $.getJSON(`/recipes/${params[0]}/${params[1]}`, function (response) {
         response.resultsIndexes = response.resultsIndexes.filter(element => {
             return element !== null
         })
-        const historyItem = new HistoryItem({ searchTerm: response.data.searchTerm, index: searchHistoryIndex }, removeSpaces(response.data.searchTerm), response.data.type, response.data.results, response.resultsIndexes, true);
+        const historyItem = new HistoryItem({ searchTerm: response.data.searchTerm, index: params[1] }, params[1], response.data.type, response.data.results, response.resultsIndexes, true);
         historyItem.showRecipes();
     })
 }
 
-function resetRecipesView(searchTerm, type, searchHistoryIndex) {
+function resetRecipesView(type, dbKey) {
     $('#food-drink-view').empty();
-    $.getJSON(`/recipes/${type}/${removeSpaces(searchTerm)}`, function (response) {
+    $.getJSON(`/recipes/${type}/${dbKey}`, function (response) {
         response.resultsIndexes = response.resultsIndexes.filter(element => {
             return element !== null
         });
-        const historyItem = new HistoryItem({ searchTerm: response.data.searchTerm, index: searchHistoryIndex }, removeSpaces(response.data.searchTerm), response.data.type, response.data.results, response.resultIndexes, true);
+        const historyItem = new HistoryItem({ searchTerm: response.data.searchTerm, index: dbKey }, dbKey, response.data.type, response.data.results, response.resultIndexes, true);
         historyItem.showRecipes();
     })
 }
@@ -288,18 +308,18 @@ function resetRecipesView(searchTerm, type, searchHistoryIndex) {
 function getSearchHistory() {
     $.getJSON('/recipes', function (data) {
         displayLoggedInState();
-        let { food, drink } = data;
-        for (let item in food) {
-            let itemData = food[item];
-            if (itemData === null) continue;
-            let historyItem = new HistoryItem(itemData, removeSpaces(itemData.searchTerm), "food");
-            historyItem.display();
-        }
-        for (let item in drink) {
-            let itemData = drink[item];
-            if (itemData === null) continue;
-            let historyItem = new HistoryItem(itemData, removeSpaces(itemData.searchTerm), "drink");
-            historyItem.display();
+        let ingredientSearchCount = 0;
+        for (const recipeType in data.data) {
+            for (const dbKey in data.data[recipeType]) {
+                if (recipeType === "ingredients") {
+                    ingredientSearchCount++;
+                }
+                let itemData = data.data[recipeType][dbKey];
+                if (itemData === null) continue;
+                let historyItem = new HistoryItem(itemData, dbKey, recipeType);
+                historyItem.display(ingredientSearchCount);
+                $("#ingredients-history").hide();
+            }
         }
     })
 }
@@ -312,6 +332,7 @@ $(document).on('click', ".auth-toggle-button", toggleAuthForm);
 $(document).on('click', "#signup-button", signupUser);
 $(document).on('click', "#login-button", loginUser);
 $(document).on('click', '#logout-icon', logoutUser);
+$(document).on('click', ".ingredient-item-delete", removeTermFromIngredientSearchList);
 
 $('#dish-type-select').change(function () {
     switch ($(this).val()) {

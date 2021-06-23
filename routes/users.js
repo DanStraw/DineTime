@@ -38,33 +38,25 @@ router.post('/login', async function (req, res, next) {
 
 router.post("/searchHistory", async function (req, res, next) {
   let cookie = req.cookies["session"] || null;
+  console.log('cookie: ' + cookie);
   if (cookie) {
     admin.auth().verifyIdToken(cookie)
       .then(async (decodedToken) => {
-        const { type, searchTerm, resultsLength } = req.body;
+        const { type, searchTerm, resultsLength, key } = req.body;
         const uid = decodedToken.uid;
         let _fbService = new FBService({
           searchTerm,
           type,
-          uid
+          uid,
+          key
         });
-
-        let searchesCount = 0;
-        let user = await _fbService.getUserByUID();
-        let searchList = user.recipes[`${type}`];
-        for (let search in searchList) {
-
-          if (parseInt(search) !== searchesCount) {
-            break;
-          }
-          searchesCount++;
-        }
-        const response = await _fbService.saveToUserSearches(searchesCount, resultsLength);
-        const responseObj = { success: response, index: searchesCount };
+        const response = await _fbService.saveToUserSearches(key, resultsLength);
+        console.log('response recieved: ' + response);
+        const responseObj = { success: response, index: key };
         return res.json(responseObj);
       })
       .catch(err => {
-        res.status(403).send({ message: "unauthroized" })
+        res.status(404).send({ message: "response failed" })
       });
   } else {
     res.status(403).send({ message: "unauthroized" });
@@ -95,6 +87,7 @@ router.get("/searchHistory/:type/:searchTerm", function (req, res, next) {
         });
         const user = await _fbService.getUserByUID();
         const recipes = user.recipes[`${type}`];
+
         for (let recipe in recipes) {
           if (searchTerm === recipes[recipe].searchTerm) {
             return res.send({ match: true });
@@ -110,15 +103,15 @@ router.get("/searchHistory/:type/:searchTerm", function (req, res, next) {
   }
 });
 
-router.delete('/auth/recipes/:type/:searchHistoryIndex', async function (req, res, next) {
+router.delete('/auth/recipes/:type/:dbKey', async function (req, res, next) {
   console.log('delete from search history');
-  const { type, searchHistoryIndex } = req.params;
+  const { type, dbKey } = req.params;
   const cookie = req.cookies["session"] || null;
   if (cookie) {
     admin.auth().verifyIdToken(cookie)
       .then(async (decodedToken) => {
         const { uid } = decodedToken;
-        const fbService = new FBService({ type, searchHistoryIndex, uid });
+        const fbService = new FBService({ type, dbKey, uid });
         const deleteResponse = await fbService.deleteSearch();
         res.send(deleteResponse);
       })
@@ -127,14 +120,15 @@ router.delete('/auth/recipes/:type/:searchHistoryIndex', async function (req, re
   }
 })
 
-router.delete('/auth/recipes/:type/:searchHistroyIndex/:resultsIndex', async function (req, res, next) {
-  const { type, searchHistroyIndex, resultsIndex } = req.params;
+router.delete('/auth/recipes/:type/:dbKey/:resultsIndex', async function (req, res, next) {
+  const { type, dbKey, resultsIndex } = req.params;
   const cookie = req.cookies["session"] || null;
+  console.log(`delete recipe ${resultsIndex} from type ${type} of key ${dbKey}`);
   if (cookie) {
     admin.auth().verifyIdToken(cookie)
       .then(async (decodedToken) => {
         const { uid } = decodedToken;
-        const fbService = new FBService({ type, searchHistroyIndex, resultsIndex, uid });
+        const fbService = new FBService({ type, dbKey, resultsIndex, uid });
         const deleteResponse = await fbService.deleteRecipe();
         res.send(deleteResponse);
       })

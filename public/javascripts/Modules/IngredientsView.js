@@ -5,11 +5,14 @@ class IngredientsView {
 
   showIngredients() {
     $('#ingredients-list').empty();
-    this.ingredients.forEach(ingredient => {
+    this.ingredients.forEach((ingredient, index) => {
       let ingredientView = $('<button>');
-      ingredientView.attr({ "id": ingredient, 'class': 'ingredient-item', 'data-trigger': 'hover', 'data-toggle': 'popover', 'title': 'Remove Ingredient' });
+      ingredientView.attr({ "id": ingredient, 'class': 'ingredient-item', 'disabled': 'true' });
+      let ingredientDelete = $('<button>');
+      ingredientDelete.attr({ "id": index, 'class': 'ingredient-item-delete', 'data-trigger': 'hover', 'data-toggle': 'popover', 'title': 'Remove Ingredient' })
       ingredientView.text(ingredient);
-      $('#ingredients-list').append(ingredientView);
+      ingredientDelete.text("X");
+      $('#ingredients-list').append(ingredientView).append(ingredientDelete);
     });
   }
 }

@@ -19,20 +19,25 @@ class FirebaseService {
   async saveResults() {
     if (!this.data.results) null;
     if (this.data.uid) delete this.data.uid;
-    return await database.ref(`recipes/${this.removeSpaces(this.data.searchTerm)}`).set(this.data).then(async function () {
-      return true;
-    }).catch(function (err) {
-      return false;
-    });
+    return await database.ref(`recipes/${this.data.type}`).push({
+      results: this.data.results,
+      searchTerm: this.data.searchTerm,
+      type: this.data.type
+    })
+      .then(async function (snapshot) {
+        return await snapshot.key;
+      }).catch(function (err) {
+        return false;
+      });
   };
 
-  async saveToUserSearches(searchLength, resultsLength) {
+  async saveToUserSearches(recipesKey, resultsLength) {
     if (!this.data.uid) null;
     let resultsIndexes = [];
     for (let i = 0; i < resultsLength; i++) {
       resultsIndexes.push(i);
     }
-    return await database.ref(`users/${this.data.uid}/recipes/${this.data.type}/${searchLength}`).set({
+    return await database.ref(`users/${this.data.uid}/recipes/${this.data.type}/${recipesKey}`).set({
       searchTerm: this.data.searchTerm,
       resultsIndexes: resultsIndexes
     }).then((res) => {
@@ -55,9 +60,9 @@ class FirebaseService {
   }
 
   async deleteSearch() {
-    if (!this.data.searchHistoryIndex || !this.data.type || !this.data.uid) null;
+    if (!this.data.dbKey || !this.data.type || !this.data.uid) null;
     return await database.ref()
-      .child(`users/${this.data.uid}/recipes/${this.data.type}/${this.data.searchHistoryIndex}`)
+      .child(`users/${this.data.uid}/recipes/${this.data.type}/${this.data.dbKey}`)
       .remove()
       .then(function (response) {
         return { statusCode: 202 };
@@ -69,9 +74,9 @@ class FirebaseService {
   }
 
   async deleteRecipe() {
-    if (!this.data.searchHistroyIndex || !this.data.type || !this.data.uid || !this.data.resultsIndex) null;
+    if (!this.data.dbKey || !this.data.type || !this.data.uid || !this.data.resultsIndex) null;
     return await database.ref()
-      .child(`users/${this.data.uid}/recipes/${this.data.type}/${this.data.searchHistroyIndex}/resultsIndexes/${this.data.resultsIndex}`)
+      .child(`users/${this.data.uid}/recipes/${this.data.type}/${this.data.dbKey}/resultsIndexes/${this.data.resultsIndex}`)
       .remove()
       .then(function (response) {
         return { statusCode: 202 };
@@ -87,17 +92,23 @@ class FirebaseService {
   }
 
   async getRecipes() {
-    if (!this.data.searchTerm) {
+    if (!this.data.dbKey) {
       return new Error("No search key provided");
     }
 
-    let recipes = await database.ref(`/recipes/${this.removeSpaces(this.data.searchTerm)}`).once("value").then((snapshot) => {
+    let recipes = await database.ref(`/recipes/${this.data.type}/${this.data.dbKey}`).once("value").then((snapshot) => {
       return snapshot.val();
     })
       .catch(err => {
         return err;
       });
     return recipes;
+  }
+
+  async getSearchesByType() {
+    if (!this.data.type) return null;
+    const recipes = await database.ref(`/recipes/${this.data.type}`).once("value");
+    return recipes.val();
   }
 
   async getUsers() {

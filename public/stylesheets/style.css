@@ -51,10 +51,65 @@ body{
 #signup-email,
 #signup-username,
 #signup-password,
+#ingredients-input,
 #signup-password-confirm {
     height: 35px;
     border-radius: 25px;
     background-color: honeydew;
+}
+
+.wrap {
+    position: relative;
+}
+
+#ingredients-input {
+    width: 100%;
+}
+
+#add-ingredient {
+    color: black;
+    background-color: honeydew;
+    border-color: black;
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+    border-right-width: 0px;
+    position: absolute;
+    top: 0;
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    right: 2px;
+    z-index: 2;
+    top: 2px;
+    height: 90%;
+    cursor: pointer;
+    transform: translateX(2px);
+}
+
+#add-ingredient:hover {
+    background-color: darkblue;
+    color: honeydew;
+}
+
+.ingredient-item, .ingredient-item-delete {
+    background-color: honeydew;
+    color: darkblue;
+    border-color: black;
+}
+
+.ingredient-item {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.ingredient-item-delete {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    margin-right: 5px;
+}
+
+.ingredient-item-delete:hover {
+    background-color: darkblue;
+    color: honeydew;
 }
 
 img {
@@ -174,31 +229,33 @@ aside {
     border-bottom-right-radius: 0;
 }
 
-#dish-div {
+#dish-div, #ingredients-div {
     margin-top: 5px;
     margin-left: 10px;
 }
 
-#dish-history {
+#dish-history, #drink-history, #ingredients-history {
     margin-left: 5px;
-    text-transform: uppercase;
+    text-transform: capitalize;
 }
 
 #drink-div {
     margin-left: 10px;
 }
 
-#drink-history {
-    margin-left: 5px;
-    text-transform: uppercase;
-}
 .delete{
     border-radius: 75px;
     margin-bottom: 5px; 
     margin-left: 5px;
 }
 
-#search-food, #search-drink, #add-ingredient, #ingredients-search, #signup-button, #login-button  {
+h4 span.toggle-symbol {
+    margin-right: 10px;
+    text-decoration: none !important;
+    float: left;
+}
+
+#search-food, #search-drink, #search-ingredients, #signup-button, #login-button  {
     color: white;
     background-color: darkblue;
     border-radius: 75px;

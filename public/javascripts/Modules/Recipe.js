@@ -18,65 +18,96 @@ class Recipe {
     return info;
   }
 
-  addList(ingredientsLine, ingredients, measurements, _id) {
+  generateIngredientsList(ingredientLines, _id) {
+
     let list = $('<ol>');
     list.attr("id", _id);
-    if (ingredientsLine) {
-      if (typeof ingredientsLine === "object") {
-        for (let ingredient in ingredientsLine) {
+    if (typeof ingredientLines === "object") {
+      for (let ingredientLine in ingredientLines) {
 
-          list.append(`<li>${ingredientsLine[`${ingredient}`]}</li>`);
-        }
-      } else {
-        ingredientsLine.forEach(ingredient => {
-          list.append(`<li>${ingredient}</li>`);
-        });
+        list.append(`<li>${ingredientLines[`${ingredientLine}`]}</li>`);
       }
-      return list;
-    } else if (ingredients) {
-      for (let i = 0; i < ingredients.length; i++) {
-        if (ingredients[i]) {
-          list.append("<li>" + (measurements[i] || "") + " " + ingredients[i] || (ingredients[`${i}`]["text"] || "") + "</li>");
-        }
-
-      }
-      return list;
+    } else {
+      ingredientsLine.forEach(ingredient => {
+        list.append(`<li>${ingredient}</li>`);
+      });
     }
-    return null;
+    return list;
+  }
+
+  generateListItems(listDiv, list) {
+    list.forEach(item => listDiv.append(`<li>${item}</li>`));
+    return listDiv;
+  }
+
+  showMatchPercentage(percentage) {
+    let matchDiv = $('<div>');
+    matchDiv.text("Match Percentage: " + percentage.toFixed(1) + "%");
+    return matchDiv;
   }
 
   display() {
+    let recipeData = this.data.recipe ? this.data.recipe : this.data;
     let resultDiv = this.addInfo('<div>', { "class": 'resultItem col-md-5 offset-md-1' });
     const headerRow = this.addInfo('<div>', { "class": "row" }, null);
-    var heading = this.addInfo("<h3>", { "id": "item-name", 'class': 'col-md-9' }, this.data.drinkName || this.data.strDrink || this.data.label || this.data.dishName);
-    const deleteVal = removeSpaces(this.term);
-    const deleteButton = this.addInfo('<button>', { 'class': 'col-md-2 delete-item btn btn-outline-secondary', 'value': deleteVal + "-" + this.index, 'type': "button", 'data-trigger': "hover", 'data-toggle': 'popover', 'title': `Delete '${heading.text()}' recipe`, "id": `${this.type}-${this.searchHistoryIndex}-recipe-${this.index}-delete-button` }, 'X');
-    var image = this.addInfo("<img>", { "src": this.data.picture || this.data.image || this.data.strDrinkThumb })
+    var heading = this.addInfo("<h3>", { "id": "item-name", 'class': 'col-md-9' }, recipeData.drinkName || recipeData.strDrink || recipeData.label || recipeData.dishName);
+    if (this.type === "ingredients") {
+      this.term = JSON.stringify(this.term);
+    }
+    const deleteVal = removeSpaces(removeCommas(this.term));
+    const deleteButton = this.addInfo('<button>', { 'class': 'col-md-2 delete-item btn btn-outline-secondary', 'value': deleteVal + "-" + this.index, 'type': "button", 'data-trigger': "hover", 'data-toggle': 'popover', 'title': `Delete '${heading.text()}' recipe`, "id": `${this.type}__${this.searchHistoryIndex}__recipe__${this.index}__delete-button` }, 'X');
+    var image = this.addInfo("<img>", { "src": recipeData.picture || recipeData.image || recipeData.strDrinkThumb });
 
-    if (!this.data.ingredients && !this.data.ingredientLines) {
-      this.data.ingredients = [];
-      this.data.measurements = [];
-      let count = 0;
-      for (let key in this.data) {
-        if (key.includes("strIngredient")) {
+    recipeData.ingredientLines = [];
+    let count = 0;
+
+    if (this.type === "drink") {
+      for (let key in recipeData) {
+        if (key.includes("strIngredient") && (recipeData[key] !== null)) {
           count++;
         }
       }
-      for (let i = 0; i <= count; i++) {
-        this.data.ingredients.push(this.data[`strIngredient${i + 1}`]);
-        this.data.measurements.push(this.data[`strMeasure${i + 1}`]);
+      for (let i = 1; i <= count; i++) {
+        recipeData.ingredientLines.push(recipeData[`strMeasure${i}`] + " " + recipeData[`strIngredient${i}`]);
       }
+    } else {
+      recipeData.ingredients.forEach(ingredient => recipeData.ingredientLines.push(ingredient.text));
     }
 
-    var recipe = this.addList(this.data.ingredientLine, this.data.ingredients, (this.data.measurements || []), "recipe");
-    var misc = this.addInfo("<p>", null, (this.data.calories ? "Calories: " + Math.round(this.data.calories) : this.data.type));
-    const instruction_attributes = this.data.strInstructions ? { "id": "instructions" } : { "id": "instructions", "href": (this.data.recipe || this.data.url), "title": this.data.dishName + " Recipe" };
-    var instructions = this.addInfo((this.data.strInstructions ? "<p>" : "<a>"), instruction_attributes, (!this.data.strInstructions ? "Link to Recipe" : this.data.strInstructions));
-
+    var recipe = this.generateIngredientsList(recipeData.ingredientLines.length > 0 ? recipeData.ingredientLines : recipeData.ingredientLine, "recipe");
+    var misc = this.addInfo("<p>", null, (recipeData.calories ? "Calories: " + Math.round(recipeData.calories) : recipeData.type));
+    const instruction_attributes = recipeData.strInstructions ? { "id": "instructions" } : { "id": "instructions", "href": (recipeData.url || recipeData.recipe), "title": recipeData.dishName + " Recipe" };
+    var instructions = this.addInfo((recipeData.strInstructions ? "<p>" : "<a>"), instruction_attributes, (!recipeData.strInstructions ? "Link to Recipe" : recipeData.strInstructions));
 
     this.userIsAuthorized ? headerRow.append(heading).append(deleteButton) : headerRow.append(heading);
     resultDiv.append(headerRow);
+
     resultDiv.append(image);
+    if (this.data.matchPercentage) resultDiv.append(this.showMatchPercentage(this.data.matchPercentage));
+
+    if (this.type === "ingredients") {
+      let usedIngDiv = $("<ul>");
+      usedIngDiv = this.generateListItems(usedIngDiv, this.data.usedIngredients);
+      resultDiv.append(this.addInfo("<h4>", null, "You Have:"));
+      resultDiv.append(usedIngDiv);
+
+      if (this.data.neededIngredients) {
+        let neededIngDiv = $("<ul>");
+        neededIngDiv = this.generateListItems(neededIngDiv, this.data.neededIngredients);
+        resultDiv.append(this.addInfo("<h4>", null, "What You Need:"));
+        resultDiv.append(neededIngDiv);
+      }
+
+      if (this.data.unUsedIngredients && this.data.unUsedIngredients.length > 0) {
+        let unUsedIngDiv = $("<ul>");
+        unUsedIngDiv = this.generateListItems(unUsedIngDiv, this.data.unUsedIngredients);
+        resultDiv.append(this.addInfo("<h4>", null, "What You Don't Need:"));
+        resultDiv.append(unUsedIngDiv);
+      }
+    }
+
+
+    resultDiv.append(this.addInfo("<h4>", null, "Full Recipe"));
     resultDiv.append(recipe);
     resultDiv.append(misc);
     resultDiv.append(instructions);
