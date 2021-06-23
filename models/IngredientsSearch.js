@@ -1,11 +1,6 @@
 const { RecipeSearch } = require('./RecipeSearch');
 const axios = require('axios');
 const keys = require("../keys");
-const chicken = require('../data/chicken.json');
-const rice = require('../data/rice.json');
-const salt = require('../data/salt.json');
-const pepper = require('../data/pepper.json');
-
 class IngredientsSearch extends RecipeSearch {
 
   constructor(_searchTerms, _type, _results = [], startIndex = 0, resultsLengthChanged = true, startResultsLength = 0) {
@@ -24,32 +19,8 @@ class IngredientsSearch extends RecipeSearch {
     const api_key = keys.dish;
     const api_id = keys.dish_id;
     let api_url = "https://api.edamam.com/search?app_id=" + api_id + "&app_key=" + api_key + "&q=" + ingredient + "&from=" + this.startIndex + "&to=" + (this.startIndex + 20);
-
-    let res;
-    let recipes;
-    switch (ingredient) {
-      case "chicken":
-        res = chicken;
-        recipes = res.hits.slice(this.startIndex, (this.startIndex + 20));
-        break;
-      case "rice":
-        res = rice;
-        recipes = res.hits.slice(this.startIndex, (this.startIndex + 20));
-        break;
-      case "salt":
-        res = salt;
-        recipes = res.hits.slice(this.startIndex, (this.startIndex + 20));
-        break;
-      case "pepper":
-        res = pepper;
-        recipes = res.hits.slice(this.startIndex, (this.startIndex + 20));
-        break;
-      default:
-        res = await axios.get(api_url);
-        recipes = res.data.hits;
-        break;
-    }
-    return recipes;
+    const res = await axios.get(api_url);
+    return res.data.hits;
   }
 
   async searchIngredients() {
@@ -95,7 +66,6 @@ class IngredientsSearch extends RecipeSearch {
       return result.matchPercentage >= 50
     })
     this.results = [...this.results, ...this.newResults];
-    // this.results.forEach(result => console.log('gRes: ' + result.matchPercentage));
     if (this.results.length !== this.startResultsLength) {
       this.resultsLengthChanged = true;
       this.startResultsLength = this.results.length;
