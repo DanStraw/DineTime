@@ -14,8 +14,6 @@ router.post('/:type', async function (req, res, next) {
   if (recipeSearch.type === 'ingredients') {
 
     while (recipeSearch.results.length < 10 && recipeSearch.resultsLengthChanged === true || recipeSearch.startIndex <= 20) {
-      console.log('current res less than 10: ' + recipeSearch.results.length < 10);
-      console.log('start index: ' + recipeSearch.startIndex);
       await recipeSearch.searchIngredients();
       recipeSearch.filterIngredients();
       recipeSearch.filterResultsByMatchPerc();
@@ -129,7 +127,6 @@ router.get('/:type/term/:term', async function (req, res, next) {
 
         const _fbService = new FBSrvice({ type });
         const searches = await _fbService.getSearchesByType();
-        console.log(searches);
         for (const search in searches) {
           if (search.searchTerm === term) {
             return res.json({ search, match: true })
@@ -137,6 +134,8 @@ router.get('/:type/term/:term', async function (req, res, next) {
         }
         return res.json({ search: null, match: false });
       });
+  } else {
+    return res.json({ search: null, match: false });
   }
 });
 

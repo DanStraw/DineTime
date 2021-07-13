@@ -38,7 +38,6 @@ router.post('/login', async function (req, res, next) {
 
 router.post("/searchHistory", async function (req, res, next) {
   let cookie = req.cookies["session"] || null;
-  console.log('cookie: ' + cookie);
   if (cookie) {
     admin.auth().verifyIdToken(cookie)
       .then(async (decodedToken) => {
@@ -51,7 +50,6 @@ router.post("/searchHistory", async function (req, res, next) {
           key
         });
         const response = await _fbService.saveToUserSearches(key, resultsLength);
-        console.log('response recieved: ' + response);
         const responseObj = { success: response, index: key };
         return res.json(responseObj);
       })
@@ -99,12 +97,11 @@ router.get("/searchHistory/:type/:searchTerm", function (req, res, next) {
         return res.status(403).send({ match: false, message: "Unauthorized" });
       })
   } else {
-    return res.status(403).send({ match: false, message: "Unauthorized" });
+    return res.status(403).send(JSON.stringify({ match: false }));
   }
 });
 
 router.delete('/auth/recipes/:type/:dbKey', async function (req, res, next) {
-  console.log('delete from search history');
   const { type, dbKey } = req.params;
   const cookie = req.cookies["session"] || null;
   if (cookie) {
@@ -123,7 +120,6 @@ router.delete('/auth/recipes/:type/:dbKey', async function (req, res, next) {
 router.delete('/auth/recipes/:type/:dbKey/:resultsIndex', async function (req, res, next) {
   const { type, dbKey, resultsIndex } = req.params;
   const cookie = req.cookies["session"] || null;
-  console.log(`delete recipe ${resultsIndex} from type ${type} of key ${dbKey}`);
   if (cookie) {
     admin.auth().verifyIdToken(cookie)
       .then(async (decodedToken) => {

@@ -159,7 +159,6 @@ async function searchRecipes(term, type) {
     let search = new Search(term, type);
     const userMatch = await search.userHistory();
     if (userMatch.match) {
-        console.log('userMatch true');
         return swal(`${type} search of ${term} is already in your history`);
     }
     const recipeCollectionMatch = await search.recipeHistory();
@@ -176,26 +175,30 @@ async function searchRecipes(term, type) {
         await search.newRecipe(type).then(data => {
             search.addToUserHistory(data.results.length, data.key)
                 .then(() => {
-                    let resultsIndexes = [];
-                    for (let i = 0; i < data.results.length; i++) {
-                        resultsIndexes.push(i);
-                    }
-                    if (type === "ingredients") {
-                        const recipesToDisplay = new HistoryItem({ searchTerm: data.searchTerm, index: data.key }, data.key, data.type, data.results, resultsIndexes, true);
-                        recipesToDisplay.display($("#ingredients-history").children().length + 1);
-                        recipesToDisplay.showRecipes();
-                    } else {
-                        const recipesToDisplay = new HistoryItem({ searchTerm: data.searchTerm, index: data.key }, data.key, data.type, data.results, resultsIndexes, true);
-                        recipesToDisplay.display();
-                        recipesToDisplay.showRecipes();
-                    }
-
+                    showNewResults(type, data);
                 })
                 .catch(err => {
-                    console.log('add to user hist err: ' + JSON.stringify(err));
+                    console.log('user not logged in');
+                    showNewResults(type, data);
                 })
         })
             .catch(() => swal("No recipes found")); 14
+    }
+}
+
+const showNewResults = function (type, data) {
+    let resultsIndexes = [];
+    for (let i = 0; i < data.results.length; i++) {
+        resultsIndexes.push(i);
+    }
+    if (type === "ingredients") {
+        const recipesToDisplay = new HistoryItem({ searchTerm: data.searchTerm, index: data.key }, data.key, data.type, data.results, resultsIndexes, true);
+        recipesToDisplay.display($("#ingredients-history").children().length + 1);
+        recipesToDisplay.showRecipes();
+    } else {
+        const recipesToDisplay = new HistoryItem({ searchTerm: data.searchTerm, index: data.key }, data.key, data.type, data.results, resultsIndexes, true);
+        recipesToDisplay.display();
+        recipesToDisplay.showRecipes();
     }
 }
 

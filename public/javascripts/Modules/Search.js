@@ -58,10 +58,9 @@ class Search {
       dataType: 'JSON',
       method: 'GET'
     }).then(response => {
-      console.log('search response: ' + JSON.stringify(response));
       return response;
     }).catch(err => {
-      return { match: err.match, message: err.message };
+      return { match: err.responseJSON.match, message: err.statusText };
     })
     return await searchTermIsInUserHistory;
   }
@@ -81,7 +80,6 @@ class Search {
       dataType: 'JSON',
       method: 'GET'
     }).then((response) => {
-      console.log("dbResponse", response);
       const responseObj = {
         isMatch: response.match,
         recipes: response.search
@@ -97,11 +95,6 @@ class Search {
   }
 
   async newRecipe(type) {
-    console.log('new recip' + type);
-    let term = this.term;
-    if (type == "food" || type == "drink") {
-      term = removeSpaces(term);
-    }
     const result = await $.ajax({
       url: `/recipes/${type}`,
       type: 'POST',
