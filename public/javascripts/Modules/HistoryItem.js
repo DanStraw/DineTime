@@ -51,6 +51,7 @@ class HistoryItem {
     var resultsView = $('<div>');
     resultsView.attr({ "id": this.id, "class": "row" });
     if (!this.results) return null;
+    $('#results-header-text').text(" Top Results - " + this.itemData.searchTerm);
     if (typeof this.results === "object") {
       for (let result in this.results) {
         if (this.results[result] !== null) {
