@@ -27,6 +27,9 @@ class Search {
   removeIngredient(index) {
     this.ingredients.splice(index, 1);
   }
+  clearIngredients() {
+    this.ingredients = [];
+  }
 
   getTerm() {
     return this.term;

@@ -150,6 +150,8 @@ types.forEach(type => {
         } else {
             clearInputFields();
             searchRecipes(term, type);
+            ingredientSearch.clearIngredients();
+
         }
     })
 });
@@ -176,6 +178,8 @@ async function searchRecipes(term, type) {
             search.addToUserHistory(data.results.length, data.key)
                 .then(() => {
                     showNewResults(type, data);
+                    const ingredientsView = new IngredientsView(ingredientSearch.ingredients);
+                    ingredientsView.showIngredients();
                 })
                 .catch(err => {
                     console.log('user not logged in');
