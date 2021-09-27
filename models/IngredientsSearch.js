@@ -38,7 +38,6 @@ class IngredientsSearch extends RecipeSearch {
           });
         }
         if (!recipeAlreadySaved) {
-          console.log('push: ' + hit.recipe.label);
           this.newResults.push(hit)
         };
       });
