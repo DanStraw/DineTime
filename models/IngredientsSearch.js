@@ -18,7 +18,7 @@ class IngredientsSearch extends RecipeSearch {
   async searchAPI(ingredient) {
     const api_key = keys.dish;
     const api_id = keys.dish_id;
-    let api_url = "https://api.edamam.com/search?app_id=" + api_id + "&app_key=" + api_key + "&q=" + ingredient + "&from=" + this.startIndex + "&to=" + (this.startIndex + 20);
+    let api_url = "https://api.edamam.com/search?app_id=" + api_id + "&app_key=" + api_key + "&q=" + ingredient + "&from=" + this.startIndex + "&to=" + (this.startIndex + 100);
     const res = await axios.get(api_url);
     return res.data.hits;
   }
@@ -29,9 +29,19 @@ class IngredientsSearch extends RecipeSearch {
     for (let i = 0; i < ingredients.length; i++) {
       let recipes = await this.searchAPI(ingredients[i]);
       recipes.forEach(hit => {
-        this.newResults.push(hit);
+        let recipeAlreadySaved = false;
+        if (this.results) {
+          this.results.forEach(topResult => {
+            if (topResult.recipe.label === hit.recipe.label) {
+              recipeAlreadySaved = true;
+            }
+          });
+        }
+        if (!recipeAlreadySaved) {
+          console.log('push: ' + hit.recipe.label);
+          this.newResults.push(hit)
+        };
       });
-
     }
     return this.newResults;
   }
@@ -109,7 +119,7 @@ class IngredientsSearch extends RecipeSearch {
   }
 
   updateStartIndex() {
-    this.startIndex += 20;
+    this.startIndex += 100;
   }
 
   returnResults() {
