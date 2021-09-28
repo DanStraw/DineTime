@@ -5,6 +5,7 @@ class IngredientsView {
 
   showIngredients() {
     $('#ingredients-list').empty();
+    this.checkIfValidList();
     this.ingredients.forEach((ingredient, index) => {
       let ingredientView = $('<button>');
       ingredientView.attr({ "id": ingredient, 'class': 'ingredient-item', 'disabled': 'true' });
@@ -14,5 +15,16 @@ class IngredientsView {
       ingredientDelete.text("X");
       $('#ingredients-list').append(ingredientView).append(ingredientDelete);
     });
+  }
+
+  checkIfValidList() {
+    if (this.ingredients.length === 0) {
+      $('#search-ingredients').attr('disabled', true);
+    } else if (this.ingredients.length >= 10) {
+      $('#add-ingredient').attr('disabled', true);
+    } else {
+      $('#add-ingredient').attr('disabled', false);
+      $('#search-ingredients').attr('disabled', false);
+    }
   }
 }
