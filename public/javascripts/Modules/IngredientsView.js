@@ -27,4 +27,9 @@ class IngredientsView {
       $('#search-ingredients').attr('disabled', false);
     }
   }
+
+  clearIngredientsList() {
+    this.ingredients = [];
+    $('#ingredients-list').empty();
+  }
 }

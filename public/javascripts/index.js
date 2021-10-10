@@ -151,7 +151,7 @@ types.forEach(type => {
             clearInputFields();
             searchRecipes(term, type);
             ingredientSearch.clearIngredients();
-
+            $('#ingredients-list').empty();
         }
     })
 });
@@ -159,30 +159,35 @@ types.forEach(type => {
 async function searchRecipes(term, type) {
     resetResultsView();
     let search = new Search(term, type);
+    $('.loader').show();
     const userMatch = await search.userHistory();
     if (userMatch.match) {
         return swal(`${type} search of ${term} is already in your history`);
     }
     const recipeCollectionMatch = await search.recipeHistory();
     if (recipeCollectionMatch.isMatch) {
-        search.addToUserHistory(recipeCollectionMatch.recipes.data.results.length).then(async (response) => {
-            const { index } = response;
-            let { recipes } = recipeCollectionMatch;
-            const recipesToDisplay = new HistoryItem({ searchTerm: recipes.searchTerm, index }, removeSpaces(recipes.searchTerm), recipes.type, recipes.results, true);
-            recipesToDisplay.display();
-            recipesToDisplay.showRecipes();
-        });
+        search.addToUserHistory(recipeCollectionMatch.recipes.data.results.length)
+            .then(async (response) => {
+                $('.loader').hide();
+                const { index } = response;
+                let { recipes } = recipeCollectionMatch;
+                const recipesToDisplay = new HistoryItem({ searchTerm: recipes.searchTerm, index }, removeSpaces(recipes.searchTerm), recipes.type, recipes.results, true);
+                recipesToDisplay.display();
+                recipesToDisplay.showRecipes();
+            });
 
     } else {
         await search.newRecipe(type).then(data => {
             search.addToUserHistory(data.results.length, data.key)
                 .then(() => {
+                    $('.loader').hide();
                     showNewResults(type, data);
-                    const ingredientsView = new IngredientsView(ingredientSearch.ingredients);
-                    ingredientsView.showIngredients();
+                    // const ingredientsView = new IngredientsView(ingredientSearch.ingredients);
+                    // ingredientsView.showIngredients();
                 })
                 .catch(err => {
                     console.log('user not logged in');
+                    $('.loader').hide();
                     showNewResults(type, data);
                 })
         })
@@ -332,6 +337,7 @@ function getSearchHistory() {
 }
 
 $(document).ready(getSearchHistory);
+$('.loader').hide();
 $(document).on("click", ".history", showHistoryItemRecipes);
 $(document).on("click", ".delete", deleteItemFromSearchHistory);
 $(document).on("click", ".delete-item", deleteSingleRecipe);

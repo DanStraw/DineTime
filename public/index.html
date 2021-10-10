@@ -43,7 +43,7 @@
           <h1 class="display-4">
             <b id="headline">Dine Time</b>
           </h1>
-          <h5>Recipes for Food &amp; Drinks!</h5>
+          <h5 id="subheader">Recipes for Food &amp; Drinks!</h5>
         </div>
 
       </div>
@@ -123,9 +123,16 @@
                       <i class="fa fa-table"></i><span id="results-header-text"> Top Results</span></strong>
                   </h3>
                 </div>
-                <div class="panel-body col" id="food-drink-view"></div>
+                <div class="panel-body col" id="food-drink-view">
+
+                </div>
                 <br>
                 <hr>
+                <div class="row justify-content-center" id="loader-row">
+                  <div class="col-md-3">
+                    <div class="loader"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -195,14 +202,18 @@
             </div>
           </aside>
 
-
-          <div class="col-md-2">
-            <div id="edamam-badge" data-color="white"></div>
-          </div>
-
         </div>
 
       </div>
+
+
+      <div class="row justify-content-end">
+        <div class="col-md-3">
+          <div id="edamam-badge" data-color="white"></div>
+        </div>
+      </div>
+
+
     </div>
 
 
