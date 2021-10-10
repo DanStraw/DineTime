@@ -1,0 +1,14 @@
+#food-input,
+#ingredient-input,
+#drink-input,
+#login-password,
+#login-email,
+#signup-email,
+#signup-username,
+#signup-password,
+#ingredients-input,
+#signup-password-confirm {
+    height: 35px;
+    border-radius: 25px;
+    background-color: honeydew;
+}

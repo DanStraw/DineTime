@@ -1,0 +1,24 @@
+
+#drink-recipe {
+  font-size: 30px;
+  text-shadow: 2px 2px black;
+}
+
+#drink-panel {
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 8px 16px -6px black;
+  border: none;
+}
+
+#drink-panel-heading {
+  background-image: url("../images/drinks-panel.jpg");
+  background-repeat: repeat;
+  background-attachment: stretch;
+  background-position: center;
+  height: 100px;
+  border: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background-position-y: 20%;
+}

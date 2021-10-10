@@ -1,0 +1,39 @@
+
+#history-panel {
+  position: relative;
+  width: 100%;
+  z-index: 2;
+  box-shadow: 0 8px 16px -6px black;
+  border: none;
+}
+
+#history-panel-heading{
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#dish-div, #ingredients-div, #drink-div {
+  margin-top: 5px;
+  margin-left: 10px;
+}
+
+#dish-history, #drink-history, #ingredients-history {
+  margin-left: 5px;
+  text-transform: capitalize;
+}
+
+.delete{
+  border-radius: 75px;
+  margin-bottom: 5px; 
+  margin-left: 5px;
+}
+
+h4 span.toggle-symbol {
+  margin-right: 10px;
+  text-decoration: none !important;
+  float: left;
+}
+
+.history {
+  float: left;
+}

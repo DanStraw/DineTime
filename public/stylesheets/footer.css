@@ -1,0 +1,15 @@
+.footer {
+  font-size: 10px;
+  margin-top: 10px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: grey;
+  color: white;
+  text-align: center;
+  z-index: 100;
+  padding-top: 10px;
+  box-shadow: 0px -4px 3px rgba(50, 50, 50, 0.75);
+  opacity: 0.8;
+}

@@ -1,0 +1,26 @@
+#login-button:hover, #signup-button:hover {
+  background-color: honeydew;
+  color: black;
+}
+
+#ingredients-list {
+  padding-top: 5px;
+}
+
+#search-food, #search-drink, #search-ingredients, #signup-button, #login-button  {
+  color: white;
+  background-color: darkblue;
+  border-radius: 75px;
+  margin-top: 10px;
+}
+
+#search-food:hover {
+  background-image: url("../images/food.jpeg");
+  background-size: 70px 40px;
+}
+
+#search-drink:hover {
+  background-image: url("../images/drinks.jpg");
+  background-size: 70px 40px;
+}
+

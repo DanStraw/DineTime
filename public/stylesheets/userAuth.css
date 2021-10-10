@@ -1,0 +1,12 @@
+#login-body label, #signup-body label {
+  padding-left: 10px;
+}
+
+.credential-form-buttons {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+#history-panel {
+  width: 100%;
+}

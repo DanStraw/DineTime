@@ -1,0 +1,14 @@
+#edamam-badge {
+  max-width: 30px !important;
+  max-height: 30px !important;
+  position: absolute;
+}
+
+@media screen and (max-width: 640px) {
+  #edamam-badge {
+      margin-top: 10px;
+      bottom: 10px;
+      position: relative;
+      margin-bottom: 50px;
+  }
+}

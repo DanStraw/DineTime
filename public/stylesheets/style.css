@@ -1,3 +1,16 @@
+@import './buttons.css';
+@import './drinkSearch.css';
+@import './edamam-logo.css';
+@import './foodSearch.css';
+@import './footer.css';
+@import './header.css';
+@import './history.css';
+@import './inputs.css';
+@import './loader.css';
+@import './results.css';
+@import './search.css';
+@import './userAuth.css';
+
 body{
     background-image: url("../images/background.jpg");
     min-height: 100%;
@@ -8,7 +21,6 @@ body{
 }
 
 #overlay {
-
     min-height: 1000px;
     position: absolute;
     left: 0; right: 0;
@@ -30,181 +42,10 @@ body{
     background-size: 1200px 700px;
 }
 
-#login-body label, #signup-body label {
-    padding-left: 10px;
-}
-
-.credential-form-buttons {
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
-
-#headline, #subheader {
-    color: white;
-    text-align: center;
-    text-decoration: none;
-}
-
-.card {
-    background-color: #f2f2f2;
-    padding: 20px;
-    margin-top: 15px;
-    width: 600px;
-}
-
-#food-input,
-#ingredient-input,
-#drink-input,
-#login-password,
-#login-email,
-#signup-email,
-#signup-username,
-#signup-password,
-#ingredients-input,
-#signup-password-confirm {
-    height: 35px;
-    border-radius: 25px;
-    background-color: honeydew;
-}
-
-.wrap {
-    position: relative;
-}
-
-#ingredients-input {
-    width: 100%;
-}
-
-#add-ingredient {
-    color: black;
-    background-color: honeydew;
-    border-color: black;
-    border-top-width: 0px;
-    border-bottom-width: 0px;
-    border-right-width: 0px;
-    position: absolute;
-    top: 0;
-    border-top-right-radius: 25px;
-    border-bottom-right-radius: 25px;
-    right: 2px;
-    z-index: 2;
-    top: 2px;
-    height: 90%;
-    cursor: pointer;
-    transform: translateX(2px);
-}
-
-#add-ingredient:hover {
-    background-color: darkblue;
-    color: honeydew;
-}
-
-.ingredient-item, .ingredient-item-delete {
-    background-color: honeydew;
-    color: darkblue;
-    border-color: black;
-}
-
-.ingredient-item {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-}
-
-.ingredient-item-delete {
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    margin-right: 5px;
-}
-
-.ingredient-item-delete:hover {
-    background-color: darkblue;
-    color: honeydew;
-}
-
 img {
     width: 200px;
     height: 200px;
     border-radius: 20px;
-}
-
-#item-name {
-    font-weight: bold;
-}
-
-#food-panel {
-    position: relative;
-    z-index: 2;
-    box-shadow: 0 8px 16px -6px black;
-    border: none;
-}
-
-#food-panel-heading {
-    background-image: url("../images/food-panel-heading.jpg");
-    background-repeat: repeat;
-    background-attachment: stretch;
-    background-position: center;
-    height: 100px;
-    border: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-#food-recipe {
-    font-size: 30px;
-    text-shadow: 2px 2px black;
-}
-
-/* drink search panel */
-
-#drink-recipe {
-    font-size: 30px;
-    text-shadow: 2px 2px black;
-}
-
-#drink-panel {
-    position: relative;
-    z-index: 2;
-    box-shadow: 0 8px 16px -6px black;
-    border: none;
-}
-#history-panel, #login-panel {
-    width: 100%;
-}
-
-#drink-panel-heading {
-    background-image: url("../images/drinks-panel.jpg");
-    background-repeat: repeat;
-    background-attachment: stretch;
-    background-position: center;
-    height: 100px;
-    border: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    background-position-y: 20%;
-}
-
-#results-panel {
-    position: relative;
-    z-index: 2;
-    box-shadow: 0 8px 16px -6px black;
-    border: none;
-}
-
-#results-panel-heading {
-    background-image: url("../images/recipe-book.jpg");
-    height: 100px;
-    background-repeat: no-repeat;
-    background-position-x: 50%;
-    background-position-y: 74%;
-    background-size: 900px 800px;
-    border: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-#results-title {
-    font-size: 30px;
-    text-shadow: 2px 2px black;
 }
 
 .panel-heading {
@@ -227,147 +68,7 @@ aside {
     float: left;
 }
 
-#history-panel {
-    position: relative;
-    z-index: 2;
-    box-shadow: 0 8px 16px -6px black;
-    border: none;
-}
-#history-panel-heading{
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-#dish-div, #ingredients-div {
-    margin-top: 5px;
-    margin-left: 10px;
-}
-
-#dish-history, #drink-history, #ingredients-history {
-    margin-left: 5px;
-    text-transform: capitalize;
-}
-
-#drink-div {
-    margin-left: 10px;
-}
-
-.delete{
-    border-radius: 75px;
-    margin-bottom: 5px; 
-    margin-left: 5px;
-}
-
-h4 span.toggle-symbol {
-    margin-right: 10px;
-    text-decoration: none !important;
-    float: left;
-}
-
-#search-food, #search-drink, #search-ingredients, #signup-button, #login-button  {
-    color: white;
-    background-color: darkblue;
-    border-radius: 75px;
-    margin-top: 10px;
-}
-
-#ingredients-list {
-    padding-top: 5px;
-}
-
-#search-food:hover {
-    background-image: url("../images/food.jpeg");
-    background-size: 70px 40px;
-}
-
-#search-drink:hover {
-    background-image: url("../images/drinks.jpg");
-    background-size: 70px 40px;
-}
-
-#login-button:hover, #signup-button:hover {
-    background-color: honeydew;
-    color: black;
-}
-
-.footer {
-    font-size: 10px;
-    margin-top: 10px;
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    background-color: grey;
-    color: white;
-    text-align: center;
-    z-index: 100;
-    padding-top: 10px;
-    box-shadow: 0px -4px 3px rgba(50, 50, 50, 0.75);
-    opacity: 0.8;
-}
-
 .p {
     margin-top: 5px;
     margin-bottom: 10px;
-}
-
-.history {
-    float: left;
-}
-
-.resultItem {
-    border:black solid;
-    width: auto;
-    height: auto;
-    padding: 5px;
-    margin-left: 30px;
-    margin-bottom: 5px;
-    border-radius: 10px;
-}
-
-#instructions {
-    width: 200px;
-    height: auto;
-}
-
-#edamam-badge {
-    max-width: 30px !important;
-    max-height: 30px !important;
-    position: absolute;
-}
-
-@media screen and (max-width: 640px) {
-    #edamam-badge {
-        margin-top: 10px;
-        bottom: 10px;
-        position: relative;
-        margin-bottom: 50px;
-    }
-}
-
-.loader {
-    position: relative;
-    border: 16px solid #f3f3f3; /* Light grey */
-    border-top: 16px solid #3498db; /* Blue */
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-    animation: spin 2s linear infinite;
-    z-index: 10;
-    padding-bottom: 10px;
-    min-height: 0px;
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-
-#food-select {
-    padding-top: 20px;
-}
-
-#dish-type-select {
-    color: black;
 }

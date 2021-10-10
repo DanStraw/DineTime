@@ -1,0 +1,42 @@
+#instructions {
+  width: 200px;
+  height: auto;
+}
+
+#item-name {
+  font-weight: bold;
+}
+
+#results-panel {
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 8px 16px -6px black;
+  border: none;
+}
+
+#results-panel-heading {
+  background-image: url("../images/recipe-book.jpg");
+  height: 100px;
+  background-repeat: no-repeat;
+  background-position-x: 50%;
+  background-position-y: 74%;
+  background-size: 900px 800px;
+  border: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#results-title {
+  font-size: 30px;
+  text-shadow: 2px 2px black;
+}
+
+.resultItem {
+  border:black solid;
+  width: auto;
+  height: auto;
+  padding: 5px;
+  margin-left: 30px;
+  margin-bottom: 5px;
+  border-radius: 10px;
+}
