@@ -15,6 +15,7 @@
 #dish-div, #ingredients-div, #drink-div {
   margin-top: 5px;
   margin-left: 10px;
+  cursor: pointer;
 }
 
 #dish-history, #drink-history, #ingredients-history {

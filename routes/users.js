@@ -71,6 +71,25 @@ router.get('/auth/logout', async function (req, res, next) {
   res.status(200).send({ message: "cookie cleared" });
 });
 
+router.get('/auth/token', (req, res, next) => {
+  let cookie = req.cookies["session"] || null;
+  if (cookie) {
+    admin.auth().verifyIdToken(cookie)
+      .then(async (decodedToken) => {
+        const uid = decodedToken.uid;
+        let _fbService = new FBService({
+          uid
+        });
+        const user = await _fbService.getUserByUID();
+        console.log('found user');
+        return res.send({ user });
+      })
+  } else {
+    console.log('return null');
+    return res.send({ user: null });
+  }
+})
+
 router.get("/searchHistory/:type/:searchTerm", function (req, res, next) {
   let cookie = req.cookies["session"] || null;
   let { type, searchTerm } = req.params;

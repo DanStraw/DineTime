@@ -14,12 +14,7 @@ class HistoryItem {
     if (this.type === "ingredients") {
       let ing_string = "";
       for (const term in this.itemData.searchTerm) {
-        if (ing_string === "") {
-          ing_string += this.itemData.searchTerm[term];
-        } else {
-          ing_string += `, ${this.itemData.searchTerm[term]}`;
-        }
-
+        ing_string += ing_string === "" ? this.itemData.searchTerm[term] : `, ${this.itemData.searchTerm[term]}`;
       }
       historyText = "Ingredient Search " + ingredientSearchCount;
       searchTermDiv.attr({ "data-toggle": "popover", "data-trigger": "focus", "title": ing_string });
@@ -34,7 +29,10 @@ class HistoryItem {
     histItem.append(searchTermDiv);
     var deleteButton = $("<button>")
     deleteButton.addClass("delete");
-    deleteButton.attr("value", this.type + "_" + this.id);
+    deleteButton.attr({
+      value: this.type + "__" + this.id,
+      id: this.itemData.searchTerm + "-delete"
+    });
     deleteButton.append("x");
     histItem.append(deleteButton);
 
@@ -55,7 +53,6 @@ class HistoryItem {
     if (typeof this.results === "object") {
       for (let result in this.results) {
         if (this.results[result] !== null) {
-
           const recipe = new Recipe(this.itemData.searchTerm || this.itemData, this.results[result], this.resultIndexes[result], this.type, this.itemData.index, this.userIsAuthroized);
           resultsView.append(recipe.display());
           $("#food-drink-view").prepend(resultsView);
@@ -71,4 +68,20 @@ class HistoryItem {
       })
     }
   }
+
+  deleteSearchFromUsersHistory(cb) {
+    $.ajax({
+      url: `/users/auth/recipes/${this.itemData.type}/${this.itemData.key}`,
+      type: 'DELETE',
+      dataType: 'JSON'
+    }).then(function (response) {
+      if (response.statusCode === 202) {
+        cb();
+      }
+    }).catch(err => {
+      console.log('delete err:', err);
+    })
+  }
+
+
 }

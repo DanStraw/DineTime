@@ -64,15 +64,18 @@ router.post('/:type', async function (req, res, next) {
 });
 
 router.get('/', async (req, res) => {
-  const idToken = req.cookies.session || "";
-
-  admin.auth().verifyIdToken(idToken, true)
+  const sessionToken = req.cookies.session || "";
+  console.log('getRecipes:', sessionToken);
+  admin.auth().verifyIdToken(sessionToken, true)
     .then(async (cred) => {
+      console.log('cred:', cred);
       let _fbService = new FBSrvice({ idToken: cred.uid });
       let data = await _fbService.getSearchHistory();
+      console.log('send Recipes')
       res.send({ data });
     })
     .catch(err => {
+      console.log(err);
       res.status(403).send("Unauthorized");
     })
 

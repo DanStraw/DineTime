@@ -21,11 +21,18 @@ class Search {
   }
 
   addIngredient(ingredient) {
-    this.ingredients.push(ingredient);
+    this.ingredients = [...this.ingredients, ingredient];
+    let ingredientsView = new IngredientsView(this.ingredients);
+    ingredientsView.showIngredients();
+    $('#ingredients-input').val("");
+    $('#ingredients-input').focus();
   }
 
   removeIngredient(index) {
     this.ingredients.splice(index, 1);
+    let ingredientsView = new IngredientsView(this.ingredients);
+    ingredientsView.showIngredients();
+    $('#ingredients-input').val("");
   }
   clearIngredients() {
     this.ingredients = [];
@@ -112,4 +119,62 @@ class Search {
     });
     return result;
   }
+
+  //move HitoryItem to cb in index.js line 41
+  async searchRecipes() {
+    $('.loader').show();
+    const userMatch = await this.userHistory();
+    if (userMatch.match) {
+      $('.loader').hide();
+      return swal(`${this.type} search of ${this.term} is already in your history`);
+    }
+    const recipeCollectionMatch = await this.recipeHistory();
+    if (recipeCollectionMatch.isMatch) {
+      this.addToUserHistory(recipeCollectionMatch.recipes.data.results.length)
+        .then(async (response) => {
+          $('.loader').hide();
+          const { index } = response;
+          let { recipes } = recipeCollectionMatch;
+          const recipesToDisplay = new HistoryItem({ searchTerm: recipes.searchTerm, index }, removeSpaces(recipes.searchTerm), recipes.type, recipes.results, true);
+          recipesToDisplay.display();
+          recipesToDisplay.showRecipes();
+        });
+
+    } else {
+      await this.newRecipe(this.type).then(data => {
+        this.addToUserHistory(data.results.length, data.key)
+          .then(() => {
+            $('.loader').hide();
+            const recipesView = new RecipesView({ type: this.type, data });
+            recipesView.showNewResults();
+          })
+          .catch(err => {
+            $('.loader').hide();
+            const recipesView = new RecipesView({ type: this.type, data });
+            recipesView.showNewResults();
+            // showNewResults(this.type, data);
+          })
+      })
+        .catch(() => swal("No recipes found")); 14
+    }
+  }
 }
+/*
+function removeTermFromIngredientSearchList(event) {
+  event.preventDefault();
+}
+*/
+
+let ingredientsListSearch = new Search(null, 'ingredient');
+
+$("#add-ingredient").on('click', function (event) {
+  event.preventDefault();
+  const ingredient = $('#ingredients-input');
+  ingredientsListSearch.addIngredient(ingredient[0].value);
+});
+
+$(document).on('click', ".ingredient-item-delete", (event) => {
+  event.preventDefault();
+  const index = $(this).attr("id");
+  ingredientsListSearch.removeIngredient(index);
+});
