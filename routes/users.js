@@ -81,11 +81,9 @@ router.get('/auth/token', (req, res, next) => {
           uid
         });
         const user = await _fbService.getUserByUID();
-        console.log('found user');
         return res.send({ user });
       })
   } else {
-    console.log('return null');
     return res.send({ user: null });
   }
 })
@@ -93,7 +91,7 @@ router.get('/auth/token', (req, res, next) => {
 router.get("/searchHistory/:type/:searchTerm", function (req, res, next) {
   let cookie = req.cookies["session"] || null;
   let { type, searchTerm } = req.params;
-  if (cookie) {
+  if (cookie !== null) {
     admin.auth().verifyIdToken(cookie)
       .then(async (decodedToken) => {
         const uid = decodedToken.uid;

@@ -12,7 +12,6 @@ const clearInputFields = function () {
     $("#drink-input").val("");
 }
 const resetResultsView = function () {
-    console.log('reset results View');
     $("#food-drink-view").empty();
     $("#food-drink-view").show();
     $("#results-header-text").text("Top Results");
@@ -24,28 +23,10 @@ const clearSearchHisory = function () {
     $("#ingredients-history").empty();
 }
 
-const ingredientSearch = new Search(null, 'ingredient');
-const types = ['food', 'drink', 'ingredients'];
-
-types.forEach(type => {
-    $(`#search-${type}`).on("click", function (event) {
-        event.preventDefault();
-        var term = type === "ingredients" ? ingredientSearch.ingredients : $(`#${type}-input`).val().trim();
-        clearInputFields();
-        if (term === "") {
-            return swal("You left the search box empty");
-        } else {
-            resetResultsView();
-            const recipeSearch = new Search(term, type);
-            recipeSearch.searchRecipes();
-            ingredientSearch.clearIngredients();
-            $('#ingredients-list').empty();
-        }
-    })
-});
-
-$('#dish-type-select').change(function () {
-    switch ($(this).val()) {
+$('#dish-type-select').change(function (event) {
+    event.preventDefault();
+    console.log('change:', event.target.value);
+    switch (event.target.value) {
         case 'ingredients':
             $('#food-recipe-search').hide();
             $('#food-input').empty();
@@ -57,7 +38,39 @@ $('#dish-type-select').change(function () {
             $("#food-recipe-search").show();
             break;
     }
-})
+});
+
+let ingredientsListSearch = new Search(null, 'ingredient');
+const types = ['food', 'drink', 'ingredients'];
+
+$("#add-ingredient").on('click', function (event) {
+    event.preventDefault();
+    const ingredient = $('#ingredients-input');
+    ingredientsListSearch.addIngredient(ingredient[0].value);
+});
+
+$(document).on('click', ".ingredient-item-delete", (event) => {
+    event.preventDefault();
+    const index = $(this).attr("id");
+    ingredientsListSearch.removeIngredient(index);
+});
+
+types.forEach(type => {
+    $(`#search-${type}`).on("click", function (event) {
+        event.preventDefault();
+        var term = type === "ingredients" ? ingredientsListSearch.ingredients : $(`#${type}-input`).val().trim();
+        clearInputFields();
+        if (term === "") {
+            return swal("You left the search box empty");
+        } else {
+            resetResultsView();
+            const recipeSearch = new Search(term, type);
+            recipeSearch.searchRecipes();
+            ingredientsListSearch.clearIngredients();
+            $('#ingredients-list').empty();
+        }
+    })
+});
 
 $(document).ready(() => {
     const userAuth = new UserAuth(null);
@@ -89,10 +102,8 @@ $(document).on("click", ".delete", (event) => {
     const historySearchToDelete = new HistoryItem({ type, key });
     historySearchToDelete.deleteSearchFromUsersHistory(() => {
         clearSearchHisory();
-        console.log(event.target.id);
         const displayedResults = $('#results-header-text').text().split(" - ")[1].trim();
         const deletedResults = event.target.id.split('-')[0].trim();
-        console.log(displayedResults === deletedResults);
         if (displayedResults === deletedResults) resetResultsView();
         const history = new History();
         history.getSearchHistory();
@@ -105,14 +116,10 @@ $(document).on("click", ".delete-item", (event) => {
         dbKey: idString[1],
         recipeResultsIndex: idString[3]
     }
-    $('#food-drink-view').empty();
     const recipesView = new RecipesView(data);
+    $(`#resultItem-${data.recipeResultsIndex}`).hide();
     recipesView.deleteSingleRecipe((res) => {
-        const updatedView = new RecipesView({ type: res.type, dbKey: res.dbKey });
-        updatedView.resetRecipesView((response) => {
-            const historyItem = new HistoryItem({ searchTerm: response.data.searchTerm, index: data.dbKey }, data.dbKey, response.data.type, response.data.results, response.resultsIndexes, true);
-            historyItem.showRecipes();
-        });
+        return res;
     })
 });
 $(document).on('click', ".auth-toggle-button", () => {

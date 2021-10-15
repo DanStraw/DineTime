@@ -48,9 +48,9 @@ class Recipe {
 
   display() {
     let recipeData = this.data.recipe ? this.data.recipe : this.data;
-    let resultDiv = this.addInfo('<div>', { "class": 'resultItem col-md-5 offset-md-1' });
+    let resultDiv = this.addInfo('<div>', { "class": 'resultItem col-md-5 offset-md-1', id: `resultItem-${this.index}` });
     const headerRow = this.addInfo('<div>', { "class": "row" }, null);
-    var heading = this.addInfo("<h3>", { "id": "item-name", 'class': 'col-md-9' }, recipeData.drinkName || recipeData.strDrink || recipeData.label || recipeData.dishName);
+    var heading = this.addInfo("<h3>", { 'class': 'item-name col-12 col-md-9' }, recipeData.drinkName || recipeData.strDrink || recipeData.label || recipeData.dishName);
     if (this.type === "ingredients") {
       this.term = JSON.stringify(this.term);
     }

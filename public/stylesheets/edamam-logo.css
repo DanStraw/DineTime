@@ -1,14 +1,15 @@
 #edamam-wrapper {
     position: relative;
-    display: inline-block;
+    width: 100%;
     align-content: center;
+    bottom: 0px;
 }  
 
 #edamam-badge {
     max-width: 30px !important;
     max-height: 30px !important;
-    position: absolute;
-    
+    position: relative;
+    bottom: 0px;
 }
 
 @media screen and (max-width: 640px) {

@@ -4,7 +4,6 @@ class IngredientsView {
   }
 
   showIngredients() {
-    console.log('view ing', this.ingredients);
     $('#ingredients-list').empty();
     this.checkIfValidList();
     this.ingredients.forEach((ingredient, index) => {

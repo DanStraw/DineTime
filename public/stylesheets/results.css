@@ -3,7 +3,7 @@
   height: auto;
 }
 
-#item-name {
+.item-name {
   font-weight: bold;
 }
 
@@ -39,4 +39,15 @@
   margin-left: 30px;
   margin-bottom: 5px;
   border-radius: 10px;
+}
+
+@media screen and (max-width: 640px) {
+  .item-name {
+    text-align: center;
+  }
+
+  .resultItem {
+    width: 250px;
+    margin-left: 40px;
+  }
 }

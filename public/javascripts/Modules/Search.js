@@ -152,29 +152,9 @@ class Search {
             $('.loader').hide();
             const recipesView = new RecipesView({ type: this.type, data });
             recipesView.showNewResults();
-            // showNewResults(this.type, data);
           })
       })
         .catch(() => swal("No recipes found")); 14
     }
   }
 }
-/*
-function removeTermFromIngredientSearchList(event) {
-  event.preventDefault();
-}
-*/
-
-let ingredientsListSearch = new Search(null, 'ingredient');
-
-$("#add-ingredient").on('click', function (event) {
-  event.preventDefault();
-  const ingredient = $('#ingredients-input');
-  ingredientsListSearch.addIngredient(ingredient[0].value);
-});
-
-$(document).on('click', ".ingredient-item-delete", (event) => {
-  event.preventDefault();
-  const index = $(this).attr("id");
-  ingredientsListSearch.removeIngredient(index);
-});

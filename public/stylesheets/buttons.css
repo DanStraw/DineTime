@@ -24,3 +24,10 @@
   background-size: 70px 40px;
 }
 
+@media screen and (max-width: 640px) {
+  .delete-item {
+    width: 50%;
+    left: 25%;
+    margin-bottom: 10px;
+  } 
+}
