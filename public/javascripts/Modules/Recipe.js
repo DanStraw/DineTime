@@ -42,8 +42,23 @@ class Recipe {
 
   showMatchPercentage(percentage) {
     let matchDiv = $('<div>');
-    matchDiv.text("Match Percentage: " + percentage.toFixed(1) + "%");
+    matchDiv.text(percentage.toFixed(1) + "% match");
+    matchDiv.attr("class", `match-text ${this.getMatchClass(percentage)}`);
     return matchDiv;
+  }
+
+  getMatchClass(percentage) {
+    if (percentage >= 90) {
+      return "match-a";
+    } else if (percentage >= 80) {
+      return "match-b";
+    } else if (percentage >= 70) {
+      return 'match-c';
+    } else if (percentage >= 60) {
+      return 'match-d';
+    } else {
+      return 'match-e';
+    }
   }
 
   display() {

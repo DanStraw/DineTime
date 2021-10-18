@@ -25,8 +25,10 @@ class FirebaseService {
       type: this.data.type
     })
       .then(async function (snapshot) {
-        return await snapshot.key;
+        console.log('ss:', snapshot.key);
+        return snapshot.key;
       }).catch(function (err) {
+        console.log('save err:', err);
         return false;
       });
   };

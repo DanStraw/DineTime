@@ -25,7 +25,6 @@ const clearSearchHisory = function () {
 
 $('#dish-type-select').change(function (event) {
     event.preventDefault();
-    console.log('change:', event.target.value);
     switch (event.target.value) {
         case 'ingredients':
             $('#food-recipe-search').hide();
